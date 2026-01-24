@@ -1,0 +1,238 @@
+Start testing: Jan 20 19:34 CST
+----------------------------------------------------------
+1/2 Testing: unit_tests
+1/2 Test: unit_tests
+Command: "/home/zpw/study/MyProject/ZLStore/build/tests/unit_tests"
+Directory: /home/zpw/study/MyProject/ZLStore/build/tests
+"unit_tests" start time: Jan 20 19:34 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/zpw/googletest/googletest/src/gtest_main.cc
+[==========] Running 32 tests from 7 test suites.
+[----------] Global test environment set-up.
+[----------] 5 tests from StatusTest
+[ RUN      ] StatusTest.DefaultIsOK
+[       OK ] StatusTest.DefaultIsOK (0 ms)
+[ RUN      ] StatusTest.OKStatus
+[       OK ] StatusTest.OKStatus (0 ms)
+[ RUN      ] StatusTest.ErrorStatus
+[       OK ] StatusTest.ErrorStatus (0 ms)
+[ RUN      ] StatusTest.NotFoundStatus
+[       OK ] StatusTest.NotFoundStatus (0 ms)
+[ RUN      ] StatusTest.ConvenienceMethods
+[       OK ] StatusTest.ConvenienceMethods (0 ms)
+[----------] 5 tests from StatusTest (0 ms total)
+
+[----------] 4 tests from ResultTest
+[ RUN      ] ResultTest.OKResult
+[       OK ] ResultTest.OKResult (0 ms)
+[ RUN      ] ResultTest.ErrorResult
+[       OK ] ResultTest.ErrorResult (0 ms)
+[ RUN      ] ResultTest.ImplicitConversion
+[       OK ] ResultTest.ImplicitConversion (0 ms)
+[ RUN      ] ResultTest.BoolOperator
+[       OK ] ResultTest.BoolOperator (0 ms)
+[----------] 4 tests from ResultTest (0 ms total)
+
+[----------] 6 tests from CryptoTest
+[ RUN      ] CryptoTest.SHA256EmptyString
+[       OK ] CryptoTest.SHA256EmptyString (0 ms)
+[ RUN      ] CryptoTest.SHA256HelloWorld
+[       OK ] CryptoTest.SHA256HelloWorld (0 ms)
+[ RUN      ] CryptoTest.SHA256Binary
+[       OK ] CryptoTest.SHA256Binary (0 ms)
+[ RUN      ] CryptoTest.SHA256Context
+[       OK ] CryptoTest.SHA256Context (0 ms)
+[ RUN      ] CryptoTest.SHA256ContextReset
+[       OK ] CryptoTest.SHA256ContextReset (0 ms)
+[ RUN      ] CryptoTest.HMACSHA256
+[       OK ] CryptoTest.HMACSHA256 (0 ms)
+[----------] 6 tests from CryptoTest (0 ms total)
+
+[----------] 4 tests from UUIDTest
+[ RUN      ] UUIDTest.GenerateFormat
+[       OK ] UUIDTest.GenerateFormat (0 ms)
+[ RUN      ] UUIDTest.GenerateUnique
+[       OK ] UUIDTest.GenerateUnique (0 ms)
+[ RUN      ] UUIDTest.IsValidTrue
+[       OK ] UUIDTest.IsValidTrue (0 ms)
+[ RUN      ] UUIDTest.IsValidFalse
+[       OK ] UUIDTest.IsValidFalse (0 ms)
+[----------] 4 tests from UUIDTest (0 ms total)
+
+[----------] 5 tests from ByteBufferTest
+[ RUN      ] ByteBufferTest.DefaultConstruct
+[       OK ] ByteBufferTest.DefaultConstruct (0 ms)
+[ RUN      ] ByteBufferTest.WriteAndRead
+[       OK ] ByteBufferTest.WriteAndRead (0 ms)
+[ RUN      ] ByteBufferTest.Clear
+[       OK ] ByteBufferTest.Clear (0 ms)
+[ RUN      ] ByteBufferTest.Retrieve
+[       OK ] ByteBufferTest.Retrieve (0 ms)
+[ RUN      ] ByteBufferTest.RetrieveAll
+[       OK ] ByteBufferTest.RetrieveAll (0 ms)
+[----------] 5 tests from ByteBufferTest (0 ms total)
+
+[----------] 4 tests from HttpParserTest
+[ RUN      ] HttpParserTest.ParseSimpleGet
+[       OK ] HttpParserTest.ParseSimpleGet (0 ms)
+[ RUN      ] HttpParserTest.ParseWithBody
+[       OK ] HttpParserTest.ParseWithBody (0 ms)
+[ RUN      ] HttpParserTest.ParseIncomplete
+[       OK ] HttpParserTest.ParseIncomplete (0 ms)
+[ RUN      ] HttpParserTest.ParseQueryParams
+[       OK ] HttpParserTest.ParseQueryParams (0 ms)
+[----------] 4 tests from HttpParserTest (0 ms total)
+
+[----------] 4 tests from CasLayoutTest
+[ RUN      ] CasLayoutTest.GetPath
+[       OK ] CasLayoutTest.GetPath (0 ms)
+[ RUN      ] CasLayoutTest.GetPathShortHash
+[       OK ] CasLayoutTest.GetPathShortHash (0 ms)
+[ RUN      ] CasLayoutTest.GetDir
+[       OK ] CasLayoutTest.GetDir (0 ms)
+[ RUN      ] CasLayoutTest.BaseDir
+[       OK ] CasLayoutTest.BaseDir (0 ms)
+[----------] 4 tests from CasLayoutTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 32 tests from 7 test suites ran. (1 ms total)
+[  PASSED  ] 32 tests.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"unit_tests" end time: Jan 20 19:34 CST
+"unit_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/2 Testing: integration_tests
+2/2 Test: integration_tests
+Command: "/home/zpw/study/MyProject/ZLStore/build/tests/integration_tests"
+Directory: /home/zpw/study/MyProject/ZLStore/build/tests
+"integration_tests" start time: Jan 20 19:34 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/zpw/googletest/googletest/src/gtest_main.cc
+[==========] Running 15 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 7 tests from DataStoreTest
+[ RUN      ] DataStoreTest.WriteAndRead
+[2026-01-20 19:34:46.523] [info] DataStore initialized, data_dir: /tmp/minis3_test_363169/data, tmp_dir: /tmp/minis3_test_363169/tmp
+[       OK ] DataStoreTest.WriteAndRead (49 ms)
+[ RUN      ] DataStoreTest.Exists
+[2026-01-20 19:34:46.573] [info] DataStore initialized, data_dir: /tmp/minis3_test_363169/data, tmp_dir: /tmp/minis3_test_363169/tmp
+[       OK ] DataStoreTest.Exists (25 ms)
+[ RUN      ] DataStoreTest.Delete
+[2026-01-20 19:34:46.598] [info] DataStore initialized, data_dir: /tmp/minis3_test_363169/data, tmp_dir: /tmp/minis3_test_363169/tmp
+[       OK ] DataStoreTest.Delete (25 ms)
+[ RUN      ] DataStoreTest.StreamRead
+[2026-01-20 19:34:46.624] [info] DataStore initialized, data_dir: /tmp/minis3_test_363169/data, tmp_dir: /tmp/minis3_test_363169/tmp
+[       OK ] DataStoreTest.StreamRead (25 ms)
+[ RUN      ] DataStoreTest.StreamReadPartial
+[2026-01-20 19:34:46.649] [info] DataStore initialized, data_dir: /tmp/minis3_test_363169/data, tmp_dir: /tmp/minis3_test_363169/tmp
+[       OK ] DataStoreTest.StreamReadPartial (50 ms)
+[ RUN      ] DataStoreTest.BeginWriteSession
+[2026-01-20 19:34:46.699] [info] DataStore initialized, data_dir: /tmp/minis3_test_363169/data, tmp_dir: /tmp/minis3_test_363169/tmp
+[       OK ] DataStoreTest.BeginWriteSession (119 ms)
+[ RUN      ] DataStoreTest.Merge
+[2026-01-20 19:34:46.819] [info] DataStore initialized, data_dir: /tmp/minis3_test_363169/data, tmp_dir: /tmp/minis3_test_363169/tmp
+[       OK ] DataStoreTest.Merge (123 ms)
+[----------] 7 tests from DataStoreTest (419 ms total)
+
+[----------] 8 tests from MetaStoreTest
+[ RUN      ] MetaStoreTest.CreateAndGetBucket
+WARNING: MYSQL_OPT_RECONNECT is deprecated and will be removed in a future version.
+[2026-01-20 19:34:46.948] [error] mysql_real_connect failed: Access denied for user 'minis3_test'@'localhost' (using password: YES)
+[2026-01-20 19:34:46.948] [error] Failed to create MySQL connection 1/2
+/home/zpw/study/MyProject/ZLStore/tests/integration/test_meta_store.cpp:26: Skipped
+MySQL not available, skipping integration tests
+
+[2026-01-20 19:34:46.948] [info] MySQL pool closed
+[  SKIPPED ] MetaStoreTest.CreateAndGetBucket (4 ms)
+[ RUN      ] MetaStoreTest.CreateDuplicateBucket
+WARNING: MYSQL_OPT_RECONNECT is deprecated and will be removed in a future version.
+[2026-01-20 19:34:46.950] [error] mysql_real_connect failed: Access denied for user 'minis3_test'@'localhost' (using password: YES)
+[2026-01-20 19:34:46.950] [error] Failed to create MySQL connection 1/2
+/home/zpw/study/MyProject/ZLStore/tests/integration/test_meta_store.cpp:26: Skipped
+MySQL not available, skipping integration tests
+
+[2026-01-20 19:34:46.950] [info] MySQL pool closed
+[  SKIPPED ] MetaStoreTest.CreateDuplicateBucket (2 ms)
+[ RUN      ] MetaStoreTest.DeleteBucket
+WARNING: MYSQL_OPT_RECONNECT is deprecated and will be removed in a future version.
+[2026-01-20 19:34:46.953] [error] mysql_real_connect failed: Access denied for user 'minis3_test'@'localhost' (using password: YES)
+[2026-01-20 19:34:46.953] [error] Failed to create MySQL connection 1/2
+/home/zpw/study/MyProject/ZLStore/tests/integration/test_meta_store.cpp:26: Skipped
+MySQL not available, skipping integration tests
+
+[2026-01-20 19:34:46.953] [info] MySQL pool closed
+[  SKIPPED ] MetaStoreTest.DeleteBucket (2 ms)
+[ RUN      ] MetaStoreTest.ListBuckets
+WARNING: MYSQL_OPT_RECONNECT is deprecated and will be removed in a future version.
+[2026-01-20 19:34:46.956] [error] mysql_real_connect failed: Access denied for user 'minis3_test'@'localhost' (using password: YES)
+[2026-01-20 19:34:46.956] [error] Failed to create MySQL connection 1/2
+/home/zpw/study/MyProject/ZLStore/tests/integration/test_meta_store.cpp:26: Skipped
+MySQL not available, skipping integration tests
+
+[2026-01-20 19:34:46.956] [info] MySQL pool closed
+[  SKIPPED ] MetaStoreTest.ListBuckets (2 ms)
+[ RUN      ] MetaStoreTest.PutAndGetObject
+WARNING: MYSQL_OPT_RECONNECT is deprecated and will be removed in a future version.
+[2026-01-20 19:34:46.958] [error] mysql_real_connect failed: Access denied for user 'minis3_test'@'localhost' (using password: YES)
+[2026-01-20 19:34:46.958] [error] Failed to create MySQL connection 1/2
+/home/zpw/study/MyProject/ZLStore/tests/integration/test_meta_store.cpp:26: Skipped
+MySQL not available, skipping integration tests
+
+[2026-01-20 19:34:46.958] [info] MySQL pool closed
+[  SKIPPED ] MetaStoreTest.PutAndGetObject (2 ms)
+[ RUN      ] MetaStoreTest.DeleteObject
+WARNING: MYSQL_OPT_RECONNECT is deprecated and will be removed in a future version.
+[2026-01-20 19:34:46.961] [error] mysql_real_connect failed: Access denied for user 'minis3_test'@'localhost' (using password: YES)
+[2026-01-20 19:34:46.961] [error] Failed to create MySQL connection 1/2
+/home/zpw/study/MyProject/ZLStore/tests/integration/test_meta_store.cpp:26: Skipped
+MySQL not available, skipping integration tests
+
+[2026-01-20 19:34:46.961] [info] MySQL pool closed
+[  SKIPPED ] MetaStoreTest.DeleteObject (2 ms)
+[ RUN      ] MetaStoreTest.ListObjects
+WARNING: MYSQL_OPT_RECONNECT is deprecated and will be removed in a future version.
+[2026-01-20 19:34:46.964] [error] mysql_real_connect failed: Access denied for user 'minis3_test'@'localhost' (using password: YES)
+[2026-01-20 19:34:46.964] [error] Failed to create MySQL connection 1/2
+/home/zpw/study/MyProject/ZLStore/tests/integration/test_meta_store.cpp:26: Skipped
+MySQL not available, skipping integration tests
+
+[2026-01-20 19:34:46.964] [info] MySQL pool closed
+[  SKIPPED ] MetaStoreTest.ListObjects (2 ms)
+[ RUN      ] MetaStoreTest.CasBlobRefCount
+WARNING: MYSQL_OPT_RECONNECT is deprecated and will be removed in a future version.
+[2026-01-20 19:34:46.966] [error] mysql_real_connect failed: Access denied for user 'minis3_test'@'localhost' (using password: YES)
+[2026-01-20 19:34:46.966] [error] Failed to create MySQL connection 1/2
+/home/zpw/study/MyProject/ZLStore/tests/integration/test_meta_store.cpp:26: Skipped
+MySQL not available, skipping integration tests
+
+[2026-01-20 19:34:46.966] [info] MySQL pool closed
+[  SKIPPED ] MetaStoreTest.CasBlobRefCount (2 ms)
+[----------] 8 tests from MetaStoreTest (23 ms total)
+
+[----------] Global test environment tear-down
+[==========] 15 tests from 2 test suites ran. (443 ms total)
+[  PASSED  ] 7 tests.
+[  SKIPPED ] 8 tests, listed below:
+[  SKIPPED ] MetaStoreTest.CreateAndGetBucket
+[  SKIPPED ] MetaStoreTest.CreateDuplicateBucket
+[  SKIPPED ] MetaStoreTest.DeleteBucket
+[  SKIPPED ] MetaStoreTest.ListBuckets
+[  SKIPPED ] MetaStoreTest.PutAndGetObject
+[  SKIPPED ] MetaStoreTest.DeleteObject
+[  SKIPPED ] MetaStoreTest.ListObjects
+[  SKIPPED ] MetaStoreTest.CasBlobRefCount
+<end of output>
+Test time =   0.45 sec
+----------------------------------------------------------
+Test Passed.
+"integration_tests" end time: Jan 20 19:34 CST
+"integration_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Jan 20 19:34 CST

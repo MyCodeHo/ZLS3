@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库服务
+  mysql:
+    image: mysql:8.0
+    container_name: minis3-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: minis3
+      MYSQL_USER: minis3
+      MYSQL_PASSWORD: minis3_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ../scripts/mysql_init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  minis3:
+    # MiniS3 服务
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: minis3-server
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    volumes:
+      - minis3_data:/var/lib/minis3/data
+      - minis3_tmp:/var/lib/minis3/tmp
+      - minis3_logs:/var/log/minis3
+      - ./server.yaml:/etc/minis3/server.yaml:ro
+    environment:
+      - TZ=Asia/Shanghai
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  # 数据卷配置
+  mysql_data:
+    driver: local
+  minis3_data:
+    driver: local
+  minis3_tmp:
+    driver: local
+  minis3_logs:
+    driver: local
+
+networks:
+  # 默认网络
+  default:
+    name: minis3-network

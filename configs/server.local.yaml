@@ -1,0 +1,55 @@
+server:
+  listen_ip: "0.0.0.0"
+  listen_port: 8080
+  io_threads: 2
+  worker_threads: 4
+  recv_buffer_size: 1048576
+  send_buffer_size: 1048576
+
+storage:
+  data_dir: "/tmp/minis3/data"
+  tmp_dir: "/tmp/minis3/tmp"
+
+mysql:
+  host: "127.0.0.1"
+  port: 3307
+  user: "minis3"
+  password: "minis3_password"
+  database: "minis3"
+  pool_size: 8
+  connect_timeout: 5
+  read_timeout: 30
+
+auth:
+  enabled: true
+  static_tokens:
+    - "dev-token-12345"
+
+limits:
+  max_body_bytes: 1073741824  # 1GB
+  max_header_bytes: 8192
+  max_concurrent_uploads: 50
+  max_concurrent_downloads: 200
+  connection_idle_timeout: 60
+  request_timeout: 3600
+
+multipart:
+  min_part_size: 5242880
+  max_part_number: 10000
+  expire_hours: 24
+
+log:
+  level: "info"
+  access_log_path: "/tmp/minis3/access.log"
+  error_log_path: "/tmp/minis3/error.log"
+  json_format: true
+
+metrics:
+  enabled: true
+  listen_port: 9090
+  path: "/metrics"
+
+gc:
+  enabled: true
+  interval_seconds: 300
+  batch_size: 100

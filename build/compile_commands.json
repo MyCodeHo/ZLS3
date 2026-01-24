@@ -1,0 +1,387 @@
+[
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/util/config.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/util/config.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/util/config.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/util/logging.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/util/logging.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/util/logging.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/util/crypto.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/util/crypto.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/util/crypto.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/util/uuid.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/util/uuid.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/util/uuid.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/util/fs.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/util/fs.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/util/fs.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/util/status.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/util/status.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/util/status.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/util/metrics.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/util/metrics.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/util/metrics.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/net/buffer/byte_buffer.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/net/buffer/byte_buffer.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/net/buffer/byte_buffer.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/net/epoll/event_loop.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/net/epoll/event_loop.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/net/epoll/event_loop.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/net/epoll/acceptor.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/net/epoll/acceptor.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/net/epoll/acceptor.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/net/epoll/channel.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/net/epoll/channel.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/net/epoll/channel.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/net/epoll/notifier.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/net/epoll/notifier.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/net/epoll/notifier.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/net/epoll/timer_wheel.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/net/epoll/timer_wheel.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/net/epoll/timer_wheel.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/net/http/http_parser.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/net/http/http_parser.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/net/http/http_parser.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/net/http/http_request.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/net/http/http_request.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/net/http/http_request.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/net/http/http_response.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/net/http/http_response.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/net/http/http_response.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/net/http/http_router.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/net/http/http_router.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/net/http/http_router.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/net/http/http_connection.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/net/http/http_connection.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/net/http/http_connection.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/db/mysql_pool.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/db/mysql_pool.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/db/mysql_pool.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/db/mysql_tx.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/db/mysql_tx.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/db/mysql_tx.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/db/meta_store.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/db/meta_store.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/db/meta_store.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/storage/data_store.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/storage/data_store.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/storage/data_store.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/storage/cas_layout.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/storage/cas_layout.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/storage/cas_layout.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/storage/gc.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/storage/gc.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/storage/gc.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/service/auth_service.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/service/auth_service.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/service/auth_service.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/service/bucket_service.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/service/bucket_service.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/service/bucket_service.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/service/object_service.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/service/object_service.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/service/object_service.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/service/multipart_service.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/service/multipart_service.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/service/multipart_service.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/service/presign_service.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/service/presign_service.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/service/presign_service.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/api/handlers/bucket_handlers.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/api/handlers/bucket_handlers.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/api/handlers/bucket_handlers.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/api/handlers/object_handlers.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/api/handlers/object_handlers.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/api/handlers/object_handlers.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/api/handlers/multipart_handlers.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/api/handlers/multipart_handlers.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/api/handlers/multipart_handlers.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/api/handlers/presign_handlers.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/api/handlers/presign_handlers.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/api/handlers/presign_handlers.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/api/handlers/health_handlers.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/api/handlers/health_handlers.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/api/handlers/health_handlers.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/api/middleware/auth_middleware.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/api/middleware/auth_middleware.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/api/middleware/auth_middleware.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/api/middleware/trace_middleware.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/api/middleware/trace_middleware.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/api/middleware/trace_middleware.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_lib.dir/src/server/server.cpp.o -c /home/zpw/study/MyProject/ZLStore/src/server/server.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/src/server/server.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/minis3_server.dir/cmd/minis3_server/main.cpp.o -c /home/zpw/study/MyProject/ZLStore/cmd/minis3_server/main.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/cmd/minis3_server/main.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/contrib/graphbuilder.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/contrib/graphbuilder.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/contrib/graphbuilder.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/contrib/graphbuilderadapter.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/contrib/graphbuilderadapter.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/contrib/graphbuilderadapter.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/binary.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/binary.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/binary.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/convert.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/convert.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/convert.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/depthguard.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/depthguard.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/depthguard.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/directives.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/directives.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/directives.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/emit.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/emit.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/emit.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/emitfromevents.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/emitfromevents.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/emitfromevents.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/emitter.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/emitter.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/emitter.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/emitterstate.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/emitterstate.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/emitterstate.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/emitterutils.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/emitterutils.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/emitterutils.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/exceptions.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/exceptions.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/exceptions.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/exp.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/exp.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/exp.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/memory.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/memory.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/memory.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/node.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/node.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/node.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/node_data.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/node_data.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/node_data.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/nodebuilder.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/nodebuilder.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/nodebuilder.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/nodeevents.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/nodeevents.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/nodeevents.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/null.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/null.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/null.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/ostream_wrapper.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/ostream_wrapper.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/ostream_wrapper.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/parse.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/parse.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/parse.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/parser.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/parser.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/parser.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/regex_yaml.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/regex_yaml.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/regex_yaml.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/scanner.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/scanner.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/scanner.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/scanscalar.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/scanscalar.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/scanscalar.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/scantag.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/scantag.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/scantag.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/scantoken.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/scantoken.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/scantoken.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/simplekey.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/simplekey.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/simplekey.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/singledocparser.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/singledocparser.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/singledocparser.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/stream.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/stream.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/stream.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-build",
+  "command": "/usr/bin/g++  -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -Wall -Wextra -Wshadow -Weffc++ -Wno-long-long -pedantic -pedantic-errors -std=c++20 -o CMakeFiles/yaml-cpp.dir/src/tag.cpp.o -c /home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/tag.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/src/tag.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/tests",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/unit_tests.dir/unit/test_status.cpp.o -c /home/zpw/study/MyProject/ZLStore/tests/unit/test_status.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/tests/unit/test_status.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/tests",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/unit_tests.dir/unit/test_crypto.cpp.o -c /home/zpw/study/MyProject/ZLStore/tests/unit/test_crypto.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/tests/unit/test_crypto.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/tests",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/unit_tests.dir/unit/test_uuid.cpp.o -c /home/zpw/study/MyProject/ZLStore/tests/unit/test_uuid.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/tests/unit/test_uuid.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/tests",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/unit_tests.dir/unit/test_byte_buffer.cpp.o -c /home/zpw/study/MyProject/ZLStore/tests/unit/test_byte_buffer.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/tests/unit/test_byte_buffer.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/tests",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/unit_tests.dir/unit/test_http_parser.cpp.o -c /home/zpw/study/MyProject/ZLStore/tests/unit/test_http_parser.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/tests/unit/test_http_parser.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/tests",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/unit_tests.dir/unit/test_cas_layout.cpp.o -c /home/zpw/study/MyProject/ZLStore/tests/unit/test_cas_layout.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/tests/unit/test_cas_layout.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/tests",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/integration_tests.dir/integration/test_data_store.cpp.o -c /home/zpw/study/MyProject/ZLStore/tests/integration/test_data_store.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/tests/integration/test_data_store.cpp"
+},
+{
+  "directory": "/home/zpw/study/MyProject/ZLStore/build/tests",
+  "command": "/usr/bin/g++ -DSPDLOG_COMPILED_LIB -I/home/zpw/study/MyProject/ZLStore/src -I/home/zpw/study/MyProject/ZLStore/include -I/usr/include/mysql -I/home/zpw/study/MyProject/ZLStore/build/_deps/yaml-cpp-src/include -I/home/zpw/study/MyProject/ZLStore/build/_deps/nlohmann_json-src/include  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG -std=c++20 -o CMakeFiles/integration_tests.dir/integration/test_meta_store.cpp.o -c /home/zpw/study/MyProject/ZLStore/tests/integration/test_meta_store.cpp",
+  "file": "/home/zpw/study/MyProject/ZLStore/tests/integration/test_meta_store.cpp"
+}
+]

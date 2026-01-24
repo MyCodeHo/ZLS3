@@ -1,0 +1,1 @@
+/usr/bin/g++  -Wall -Wextra -Wpedantic -g -O0 -DDEBUG CMakeFiles/minis3_server.dir/cmd/minis3_server/main.cpp.o -o minis3_server  libminis3_lib.a /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so -lmysqlclient _deps/yaml-cpp-build/libyaml-cppd.a /usr/local/lib/libspdlog.a 
