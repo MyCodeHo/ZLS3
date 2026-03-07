@@ -1,6 +1,8 @@
 #include "gc.h"
 #include "data_store.h"
 #include "../db/meta_store.h"
+#include "../util/fs.h"
+#include "../util/uuid.h"
 #include <spdlog/spdlog.h>
 
 namespace minis3 {
@@ -114,7 +116,65 @@ void GarbageCollector::ProcessBatch() {
     
     // 逐个删除 CAS 文件，并回调更新元数据
     for (const auto& cas_key : batch) {
-        auto status = data_store_.Delete(cas_key);
+        auto reclaimable_before = meta_store_.CanDeleteCasBlob(cas_key);
+        if (!reclaimable_before.ok()) {
+            ++fail_count;
+            spdlog::warn("GC failed to check CAS {} before delete: {}",
+                         cas_key, reclaimable_before.status().message());
+            continue;
+        }
+        if (!reclaimable_before.value()) {
+            spdlog::debug("GC skip {}, CAS is still referenced", cas_key);
+            continue;
+        }
+
+        bool renamed_to_quarantine = false;
+        std::string file_path = data_store_.GetFilePath(cas_key);
+        std::string quarantine_path = file_path + ".gc." + UUID::Generate();
+        bool source_exists = FileSystem::FileExists(file_path);
+        if (source_exists) {
+            auto rename_status = FileSystem::AtomicRename(file_path, quarantine_path);
+            if (!rename_status.ok()) {
+                ++fail_count;
+                spdlog::warn("GC failed to quarantine {}: {}", cas_key, rename_status.message());
+                continue;
+            }
+            renamed_to_quarantine = true;
+        }
+
+        auto reclaimable_after = meta_store_.CanDeleteCasBlob(cas_key);
+        if (!reclaimable_after.ok()) {
+            if (renamed_to_quarantine) {
+                auto restore_status = FileSystem::AtomicRename(quarantine_path, file_path);
+                if (!restore_status.ok()) {
+                    spdlog::error("GC failed to restore quarantined file for {}: {}",
+                                  cas_key, restore_status.message());
+                }
+            }
+            ++fail_count;
+            spdlog::warn("GC failed to re-check CAS {} after quarantine: {}",
+                         cas_key, reclaimable_after.status().message());
+            continue;
+        }
+
+        if (!reclaimable_after.value()) {
+            if (renamed_to_quarantine) {
+                auto restore_status = FileSystem::AtomicRename(quarantine_path, file_path);
+                if (!restore_status.ok()) {
+                    ++fail_count;
+                    spdlog::error("GC failed to restore CAS {} after race: {}",
+                                  cas_key, restore_status.message());
+                    continue;
+                }
+            }
+            spdlog::debug("GC cancel delete {}, CAS became referenced again", cas_key);
+            continue;
+        }
+
+        Status status = Status::OK();
+        if (renamed_to_quarantine) {
+            status = FileSystem::RemoveFile(quarantine_path);
+        }
         bool success = status.ok();
         
         if (success) {

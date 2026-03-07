@@ -826,3 +826,198 @@ storage:
 ### D. 快速收尾话术（30秒）
 
 这次优化不是单次“提速技巧”，而是基于数据的多轮迭代：先把错误率打下来，再做路径级提速，最后识别结构性瓶颈。当前最值得投入的是 `cas_blobs` 热点写竞争治理；如果继续推进，我会优先做分片计数/异步聚合，并配套更细粒度观测指标来闭环验证。
+
+---
+
+## 2026-03-07 第五轮修复：一致性与并发安全缺陷收敛（设计缺陷修复）
+
+本轮目标：修复已发现的 4 类高风险设计缺陷，重点是“数据文件与元数据跨系统一致性”与“删除/读取并发语义”。
+
+### 1) 缺陷一：PUT 成功写入文件，但 MySQL 元数据失败 -> 孤儿 CAS 文件
+
+**问题现象**
+
+- 上传路径先写 `DataStore`，再写 `MetaStore`；当元数据写失败时，磁盘上会残留无引用文件。
+
+**修复策略**
+
+- 在对象 PUT 与分片 PUT 路径加入“失败补偿清理”：
+  - 上传前预测 `cas_key`（`SHA256(body)`）并判断是否原先已存在。
+  - 若本次确实新写入且后续元数据写失败，则执行“仅清理无引用 CAS”逻辑。
+  - 清理逻辑先查 `cas_blobs`：
+   - 若不存在元数据记录（`NoSuchKey`），直接删除文件；
+   - 若存在且 `ref_count == 0`，删除文件；
+   - 否则跳过，避免误删。
+
+**落地位置**
+
+- `src/api/handlers/object_handlers.cpp`
+- `src/api/handlers/multipart_handlers.cpp`
+
+---
+
+### 2) 缺陷二：DELETE 与 GET 并发时，GET 可能在发送阶段开文件失败并直接断连
+
+**问题现象**
+
+- GET 先读取元数据并构造文件响应，真正 `open` 发生在异步发送阶段。
+- 若期间文件被删除，连接层原行为是直接 `HandleClose()`，客户端拿到连接中断而非明确 HTTP 错误。
+
+**修复策略**
+
+- 当文件发送阶段 `open` 失败时，不再直接断连：
+  - 清空待发缓冲，改为返回标准错误响应；
+  - `ENOENT` 返回 `404 Object data not found`；
+  - 其他错误返回 `500 Failed to open object data`。
+
+**落地位置**
+
+- `src/net/http/http_connection.cpp`
+
+---
+
+### 3) 缺陷三：Range 下载发送长度与响应头长度不一致风险
+
+**问题现象**
+
+- 文件响应中 `Content-Length` 已按 Range 计算，但发送端剩余字节使用了整文件长度字段，可能造成协议不一致。
+
+**修复策略**
+
+- 发送阶段剩余长度改为 `resp.FileLength()`，与响应头长度一致。
+
+**落地位置**
+
+- `src/net/http/http_connection.cpp`
+
+---
+
+### 4) 缺陷四：GC 可能误删“被重新引用”的 CAS（竞态窗口）
+
+**问题现象**
+
+- 旧逻辑是队列里拿到 key 后直接删物理文件，随后删 `cas_blobs`。
+- 若 key 在队列等待期间或删除过程中被重新引用，可能出现“元数据有效但文件已删”的严重不一致。
+
+**修复策略（两层防护）**
+
+1. **元数据可回收判定 API**：新增 `MetaStore::CanDeleteCasBlob`，在事务中校验：
+  - `cas_blobs.ref_count == 0`
+  - `objects` 无引用
+  - `multipart_parts` 无引用
+
+2. **GC 隔离删除 + 二次校验**：
+  - 删除前先做一次可回收检查；
+  - 把 CAS 文件先 `rename` 到 quarantine 临时路径（同盘原子）；
+  - 再做一次可回收检查；
+  - 若检查失败则把文件恢复回原路径；
+  - 仅在二次检查通过时真正删除临时文件。
+
+3. **回调删元数据前再确认**：
+  - GC 回调不再无条件 `DeleteCasBlob`，先 `CanDeleteCasBlob` 再删。
+
+**落地位置**
+
+- `src/db/meta_store.h`
+- `src/db/meta_store.cpp`
+- `src/storage/gc.cpp`
+- `src/server/server.cpp`
+
+---
+
+### 验证结果（本轮代码级修复后）
+
+已执行构建与测试：
+
+1. **全量构建（CMake）**：成功
+2. **单元测试（unit_tests）**：通过
+3. **集成测试（integration_tests）**：通过
+
+说明：本轮主要是正确性修复（consistency/safety），不是吞吐优化；性能数值不应直接与前几轮“提速”做同类对比。
+
+---
+
+### 设计层面的剩余风险与后续建议
+
+虽然本轮已显著缩小不一致窗口，但分布式/高并发系统中跨 DB + 文件系统的一致性无法靠单点改动“绝对消除”。建议后续继续做：
+
+1. 增加后台对账任务（扫描 `objects/multipart_parts` 与 CAS 文件存在性差异）；
+2. 对 “data exists but metadata missing” 与 “metadata exists but data missing” 分别建立自动修复策略；
+3. 增加一致性指标：
+  - orphan file 数量
+  - missing data file 数量
+  - GC quarantine 恢复次数
+  - CAS 可回收检查失败次数
+
+这会把当前“修复逻辑”升级为“可观测、可审计、可自愈”的一致性体系。
+
+---
+
+## 2026-03-07 第六轮修复：代码审查新增缺陷修复与验证
+
+本轮是在第五轮基础上继续做“细粒度代码审查”，修复了 3 个容易被忽略但会影响稳定性/协议正确性的 bug。
+
+### 1) `ByteBuffer::Shrink` 写指针计算错误
+
+**问题**
+
+- `Shrink()` 中 `writer_index_` 使用了更新后的 `reader_index_` 与旧状态混算，可能导致写指针错误，进而影响后续 buffer 行为。
+
+**修复**
+
+- 先缓存 `readable`，再基于该固定值重建 `writer_index_`。
+
+**落地文件**
+
+- `src/net/buffer/byte_buffer.cpp`
+
+---
+
+### 2) HTTP 头部解析对非法 `Content-Length` 与冲突头校验不足
+
+**问题**
+
+- 非法 `Content-Length`（例如包含非数字尾缀）会被当作 0 继续处理；
+- `Content-Length` 与 `Transfer-Encoding: chunked` 同时出现时未显式拒绝，存在协议歧义风险；
+- `Transfer-Encoding` 值匹配 `chunked` 时大小写不敏感处理不足。
+
+**修复**
+
+- `FinishHeaders` 改为返回 `bool`，在 header 收尾阶段做严格校验；
+- `Content-Length` 使用 `from_chars` 严格全量消费校验，非法立即报错；
+- 检测到 `Content-Length` 与 `chunked` 并存时直接报错；
+- `Transfer-Encoding` 值转小写后匹配 `chunked`。
+
+**落地文件**
+
+- `src/net/http/http_parser.h`
+- `src/net/http/http_parser.cpp`
+
+---
+
+### 3) 零字节对象的 Range 解析下溢
+
+**问题**
+
+- `ParseRange` 在 `file_size == 0` 时会走 `file_size - 1` 逻辑，触发 `size_t` 下溢。
+
+**修复**
+
+- `ParseRange` 开头增加 `file_size == 0` 直接拒绝（返回不可满足范围）。
+
+**落地文件**
+
+- `src/api/handlers/object_handlers.cpp`
+
+---
+
+### 验证结果
+
+本轮修改后执行：
+
+1. `Build_CMakeTools`：构建成功；
+2. `RunCtest_CMakeTools`：
+  - `unit_tests` 通过；
+  - `integration_tests` 通过。
+
+结论：本轮新增修复已通过现有回归测试，未引入可见构建或测试回归。

@@ -2,6 +2,7 @@
 #include "net/buffer/byte_buffer.h"
 #include <algorithm>
 #include <charconv>
+#include <cctype>
 
 namespace minis3 {
 
@@ -74,7 +75,10 @@ HttpParser::ParseResult HttpParser::Parse(ByteBuffer* buffer) {
                 if (line.empty()) {
                     // 空行，headers 结束
                     buffer->RetrieveUntil(crlf + 2);
-                    FinishHeaders();
+                    if (!FinishHeaders()) {
+                        state_ = ParseState::ERROR;
+                        return ParseResult::ERROR;
+                    }
                     
                     if (HasBody()) {
                         // 进入 body 解析
@@ -207,25 +211,43 @@ bool HttpParser::ParseHeader(std::string_view line) {
     return true;
 }
 
-void HttpParser::FinishHeaders() {
+bool HttpParser::FinishHeaders() {
+    content_length_ = 0;
+    remaining_body_length_ = 0;
+    chunked_ = false;
+
     // 检查 Content-Length
     auto content_length_header = request_.GetHeader("content-length");
     if (!content_length_header.empty()) {
+        size_t parsed_length = 0;
         auto result = std::from_chars(
             content_length_header.data(),
             content_length_header.data() + content_length_header.size(),
-            content_length_);
-        if (result.ec != std::errc()) {
-            content_length_ = 0;
+            parsed_length);
+        if (result.ec != std::errc() || result.ptr != content_length_header.data() + content_length_header.size()) {
+            error_message_ = "Invalid Content-Length";
+            return false;
         }
+        content_length_ = parsed_length;
         remaining_body_length_ = content_length_;
     }
     
     // 检查 Transfer-Encoding
     auto transfer_encoding = request_.GetHeader("transfer-encoding");
+    if (!transfer_encoding.empty()) {
+        std::transform(transfer_encoding.begin(), transfer_encoding.end(), transfer_encoding.begin(),
+                       [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    }
+
     if (!transfer_encoding.empty() && transfer_encoding.find("chunked") != std::string::npos) {
+        if (content_length_ > 0) {
+            error_message_ = "Conflicting Content-Length and Transfer-Encoding";
+            return false;
+        }
         chunked_ = true;
     }
+
+    return true;
 }
 
 } // namespace minis3

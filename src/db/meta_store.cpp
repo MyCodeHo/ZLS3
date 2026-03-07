@@ -805,6 +805,71 @@ Status MetaStore::DeleteCasBlob(const std::string& sha256_hash) {
     return Status::OK();
 }
 
+Result<bool> MetaStore::CanDeleteCasBlob(const std::string& sha256_hash) {
+    auto conn = pool_.GetConnection();
+    if (!conn) {
+        return Result<bool>::Err(ErrorCode::DatabaseError, "No MySQL connection");
+    }
+
+    Transaction tx(conn);
+    std::string cas_esc = conn->Escape(sha256_hash);
+
+    std::string lock_sql = "SELECT ref_count FROM cas_blobs WHERE cas_key='" + cas_esc + "' FOR UPDATE";
+    MYSQL_RES* lock_res = tx.Query(lock_sql);
+    if (!lock_res) {
+        return Result<bool>::Err(ErrorCode::DatabaseError, conn->LastError());
+    }
+
+    MYSQL_ROW lock_row = mysql_fetch_row(lock_res);
+    if (!lock_row || !lock_row[0]) {
+        mysql_free_result(lock_res);
+        if (!tx.Commit()) {
+            return Result<bool>::Err(ErrorCode::DatabaseError, "Failed to commit transaction");
+        }
+        return Result<bool>::Ok(false);
+    }
+
+    int ref_count = std::stoi(lock_row[0]);
+    mysql_free_result(lock_res);
+    if (ref_count != 0) {
+        if (!tx.Commit()) {
+            return Result<bool>::Err(ErrorCode::DatabaseError, "Failed to commit transaction");
+        }
+        return Result<bool>::Ok(false);
+    }
+
+    std::string obj_sql = "SELECT COUNT(*) FROM objects WHERE cas_key='" + cas_esc + "'";
+    MYSQL_RES* obj_res = tx.Query(obj_sql);
+    if (!obj_res) {
+        return Result<bool>::Err(ErrorCode::DatabaseError, conn->LastError());
+    }
+    MYSQL_ROW obj_row = mysql_fetch_row(obj_res);
+    int64_t obj_count = (obj_row && obj_row[0]) ? std::stoll(obj_row[0]) : 0;
+    mysql_free_result(obj_res);
+
+    if (obj_count > 0) {
+        if (!tx.Commit()) {
+            return Result<bool>::Err(ErrorCode::DatabaseError, "Failed to commit transaction");
+        }
+        return Result<bool>::Ok(false);
+    }
+
+    std::string part_sql = "SELECT COUNT(*) FROM multipart_parts WHERE cas_key='" + cas_esc + "'";
+    MYSQL_RES* part_res = tx.Query(part_sql);
+    if (!part_res) {
+        return Result<bool>::Err(ErrorCode::DatabaseError, conn->LastError());
+    }
+    MYSQL_ROW part_row = mysql_fetch_row(part_res);
+    int64_t part_count = (part_row && part_row[0]) ? std::stoll(part_row[0]) : 0;
+    mysql_free_result(part_res);
+
+    if (!tx.Commit()) {
+        return Result<bool>::Err(ErrorCode::DatabaseError, "Failed to commit transaction");
+    }
+
+    return Result<bool>::Ok(part_count == 0);
+}
+
 // ===== Multipart =====
 
 Result<std::string> MetaStore::CreateMultipartUpload(const std::string& upload_id,

@@ -66,7 +66,20 @@ Status Server::Init() {
         // 删除成功后同步清理元数据记录
         gc_->SetDeleteCallback([this](const std::string& cas_key, bool success) {
             if (success && meta_store_) {
-                meta_store_->DeleteCasBlob(cas_key);
+                auto reclaimable = meta_store_->CanDeleteCasBlob(cas_key);
+                if (!reclaimable.ok()) {
+                    spdlog::warn("GC callback failed to re-check CAS {}: {}",
+                                 cas_key, reclaimable.status().message());
+                    return;
+                }
+                if (!reclaimable.value()) {
+                    spdlog::debug("GC callback skip metadata delete for {}, CAS is referenced again", cas_key);
+                    return;
+                }
+                auto status = meta_store_->DeleteCasBlob(cas_key);
+                if (!status.ok()) {
+                    spdlog::warn("GC callback failed to delete CAS metadata {}: {}", cas_key, status.message());
+                }
             }
         });
     }

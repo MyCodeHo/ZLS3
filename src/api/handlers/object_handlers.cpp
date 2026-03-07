@@ -8,6 +8,30 @@ namespace minis3 {
 
 using json = nlohmann::json;
 
+namespace {
+
+void CleanupUnreferencedCas(MetaStore& meta_store, DataStore& data_store, const std::string& cas_key) {
+    auto cas_result = meta_store.GetCasBlob(cas_key);
+    if (!cas_result.ok()) {
+        if (cas_result.code() == ErrorCode::NoSuchKey) {
+            auto status = data_store.Delete(cas_key);
+            if (!status.ok()) {
+                spdlog::warn("Failed to cleanup orphan CAS file {}: {}", cas_key, status.message());
+            }
+        }
+        return;
+    }
+
+    if (cas_result.value().ref_count == 0) {
+        auto status = data_store.Delete(cas_key);
+        if (!status.ok()) {
+            spdlog::warn("Failed to cleanup unreferenced CAS file {}: {}", cas_key, status.message());
+        }
+    }
+}
+
+} // namespace
+
 HttpResponse ObjectHandlers::PutObject(HttpRequest& request, MetaStore& meta_store, DataStore& data_store,
                                        GarbageCollector* gc) {
     // 解析路径参数
@@ -42,6 +66,7 @@ HttpResponse ObjectHandlers::PutObject(HttpRequest& request, MetaStore& meta_sto
     // 写入数据到 CAS（流式场景可直接复用内部 CAS）
         std::string cas_key;
         size_t data_size = body.size();
+        bool may_need_cleanup = false;
         if (!internal_cas.empty()) {
             cas_key = internal_cas;
             try {
@@ -50,17 +75,22 @@ HttpResponse ObjectHandlers::PutObject(HttpRequest& request, MetaStore& meta_sto
                 data_size = body.size();
             }
         } else {
+            std::string predicted_cas = Crypto::SHA256(body);
+            bool existed_before = data_store.Exists(predicted_cas);
             auto write_result = data_store.Write(body.data(), body.size());
             if (!write_result.ok()) {
                 spdlog::error("Failed to write object data: {}", write_result.status().message());
                 return HttpResponse::InternalError("Failed to write object data");
             }
             cas_key = write_result.value();
+            may_need_cleanup = (!existed_before && cas_key == predicted_cas);
         }
     
     // 校验 SHA256（如果提供）
     if (!expected_sha256.empty() && expected_sha256 != cas_key) {
-        // 删除刚写入的数据（不增加引用计数）
+        if (may_need_cleanup) {
+            CleanupUnreferencedCas(meta_store, data_store, cas_key);
+        }
         spdlog::warn("Checksum mismatch: expected {}, got {}", expected_sha256, cas_key);
         return HttpResponse::BadRequest("Checksum mismatch");
     }
@@ -119,6 +149,9 @@ HttpResponse ObjectHandlers::PutObject(HttpRequest& request, MetaStore& meta_sto
     
     if (!obj_result.ok()) {
         spdlog::error("Failed to put object metadata: {}", obj_result.status().message());
+        if (may_need_cleanup) {
+            CleanupUnreferencedCas(meta_store, data_store, cas_key);
+        }
         return HttpResponse::InternalError("Failed to create object");
     }
 
@@ -385,6 +418,10 @@ HttpResponse ObjectHandlers::ListObjects(HttpRequest& request, MetaStore& meta_s
 
 std::optional<std::pair<size_t, size_t>> ObjectHandlers::ParseRange(
     const std::string& range_header, size_t file_size) {
+
+    if (file_size == 0) {
+        return std::nullopt;
+    }
     
     // 格式: bytes=start-end
     static std::regex range_regex(R"(bytes=(\d*)-(\d*))");

@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <cstring>
+#include <cerrno>
 #include <spdlog/spdlog.h>
 
 namespace minis3 {
@@ -315,12 +316,19 @@ void HttpConnection::Send(HttpResponse response) {
             self->file_fd_ = ::open(resp.FilePath().c_str(), O_RDONLY);
             if (self->file_fd_ < 0) {
                 spdlog::error("Failed to open file: {}", resp.FilePath());
-                self->HandleClose();
+                self->output_buffer_.RetrieveAll();
+                HttpResponse error_resp = (errno == ENOENT)
+                    ? HttpResponse::NotFound("Object data not found")
+                    : HttpResponse::InternalError("Failed to open object data");
+                error_resp.SetKeepAlive(self->parser_.Request().IsKeepAlive());
+                error_resp.AppendToBuffer(&self->output_buffer_);
+                self->state_ = ConnectionState::WRITING_RESPONSE;
+                self->channel_->EnableWriting();
                 return;
             }
             
             self->file_offset_ = resp.FileOffset();
-            self->file_remaining_ = resp.FileSize();
+            self->file_remaining_ = resp.FileLength();
             self->state_ = ConnectionState::SENDING_FILE;
         } else {
             self->state_ = ConnectionState::WRITING_RESPONSE;

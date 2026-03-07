@@ -1,4 +1,5 @@
 #include "multipart_handlers.h"
+#include "util/crypto.h"
 #include "util/uuid.h"
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
@@ -16,6 +17,26 @@ std::string NormalizeEtagValue(const std::string& etag) {
         return etag.substr(1, etag.size() - 2);
     }
     return etag;
+}
+
+void CleanupUnreferencedCas(MetaStore& meta_store, DataStore& data_store, const std::string& cas_key) {
+    auto cas_result = meta_store.GetCasBlob(cas_key);
+    if (!cas_result.ok()) {
+        if (cas_result.code() == ErrorCode::NoSuchKey) {
+            auto status = data_store.Delete(cas_key);
+            if (!status.ok()) {
+                spdlog::warn("Failed to cleanup orphan multipart CAS file {}: {}", cas_key, status.message());
+            }
+        }
+        return;
+    }
+
+    if (cas_result.value().ref_count == 0) {
+        auto status = data_store.Delete(cas_key);
+        if (!status.ok()) {
+            spdlog::warn("Failed to cleanup unreferenced multipart CAS file {}: {}", cas_key, status.message());
+        }
+    }
 }
 
 } // namespace
@@ -138,6 +159,7 @@ HttpResponse MultipartHandlers::UploadPart(HttpRequest& request, MetaStore& meta
     
     std::string cas_key;
     size_t data_size = body.size();
+    bool may_need_cleanup = false;
     if (!internal_cas.empty()) {
         cas_key = internal_cas;
         try {
@@ -146,6 +168,8 @@ HttpResponse MultipartHandlers::UploadPart(HttpRequest& request, MetaStore& meta
             data_size = body.size();
         }
     } else {
+        std::string predicted_cas = Crypto::SHA256(body);
+        bool existed_before = data_store.Exists(predicted_cas);
         // 写入数据到 CAS
         auto write_result = data_store.Write(body.data(), body.size());
         if (!write_result.ok()) {
@@ -153,6 +177,7 @@ HttpResponse MultipartHandlers::UploadPart(HttpRequest& request, MetaStore& meta
             return HttpResponse::InternalError("Failed to write part data");
         }
         cas_key = write_result.value();
+        may_need_cleanup = (!existed_before && cas_key == predicted_cas);
     }
     
     // 计算 ETag
@@ -170,6 +195,9 @@ HttpResponse MultipartHandlers::UploadPart(HttpRequest& request, MetaStore& meta
     
     if (!part_result.ok()) {
         spdlog::error("Failed to create part record: {}", part_result.status().message());
+        if (may_need_cleanup) {
+            CleanupUnreferencedCas(meta_store, data_store, cas_key);
+        }
         return HttpResponse::InternalError("Failed to create part");
     }
 
@@ -293,6 +321,7 @@ HttpResponse MultipartHandlers::CompleteUpload(HttpRequest& request, MetaStore& 
     
     if (!obj_result.ok()) {
         spdlog::error("Failed to create object: {}", obj_result.status().message());
+        CleanupUnreferencedCas(meta_store, data_store, final_cas_key);
         return HttpResponse::InternalError("Failed to create object");
     }
 

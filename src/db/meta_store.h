@@ -249,6 +249,11 @@ public:
      * 删除 CAS Blob 记录
      */
     Status DeleteCasBlob(const std::string& sha256_hash);
+
+    /**
+     * 检查 CAS Blob 是否可安全回收（ref_count=0 且无对象/分片引用）
+     */
+    Result<bool> CanDeleteCasBlob(const std::string& sha256_hash);
     
     // ===== Multipart Upload 操作 =====
     

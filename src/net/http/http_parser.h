@@ -97,7 +97,7 @@ public:
 private:
     bool ParseRequestLine(std::string_view line);
     bool ParseHeader(std::string_view line);
-    void FinishHeaders();
+    bool FinishHeaders();
     
     ParseState state_;
     HttpRequest request_;

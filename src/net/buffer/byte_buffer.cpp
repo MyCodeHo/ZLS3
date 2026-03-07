@@ -83,11 +83,12 @@ void ByteBuffer::EnsureWritableBytes(size_t len) {
 
 void ByteBuffer::Shrink(size_t reserve) {
     // 缩容并保留一定空闲空间
-    std::vector<char> buf(kPrependSize + ReadableBytes() + reserve);
-    std::copy(Peek(), Peek() + ReadableBytes(), buf.data() + kPrependSize);
+    size_t readable = ReadableBytes();
+    std::vector<char> buf(kPrependSize + readable + reserve);
+    std::copy(Peek(), Peek() + readable, buf.data() + kPrependSize);
     buf.swap(buffer_);
     reader_index_ = kPrependSize;
-    writer_index_ = reader_index_ + ReadableBytes();
+    writer_index_ = reader_index_ + readable;
 }
 
 const char* ByteBuffer::FindCRLF() const {
