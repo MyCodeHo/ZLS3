@@ -9,6 +9,29 @@
 
 namespace minis3 {
 
+SyncMode DataStore::ParseSyncMode(const std::string& mode) {
+    if (mode == "none") {
+        return SyncMode::NONE;
+    }
+    if (mode == "fdatasync") {
+        return SyncMode::FDATASYNC;
+    }
+    return SyncMode::FSYNC;
+}
+
+const char* DataStore::SyncModeToString(SyncMode mode) {
+    switch (mode) {
+        case SyncMode::FSYNC:
+            return "fsync";
+        case SyncMode::FDATASYNC:
+            return "fdatasync";
+        case SyncMode::NONE:
+            return "none";
+        default:
+            return "fsync";
+    }
+}
+
 // WriteSession 实现
 
 WriteSession::WriteSession(const std::string& tmp_path, int fd)
@@ -82,7 +105,7 @@ Status WriteSession::Write(const char* data, size_t len) {
     return Status::OK();
 }
 
-Result<std::string> WriteSession::Finish() {
+Result<std::string> WriteSession::Finish(SyncMode sync_mode) {
     // 完成写入并返回 SHA256
     if (finished_) {
         return Status::Error(ErrorCode::InternalError, "WriteSession already finished");
@@ -90,9 +113,18 @@ Result<std::string> WriteSession::Finish() {
     
     finished_ = true;
     
-    // 确保数据落盘
-    if (::fsync(fd_) != 0) {
-        spdlog::warn("fsync failed: {}", strerror(errno));
+    // 按策略落盘
+    int sync_result = 0;
+    if (sync_mode == SyncMode::FSYNC) {
+        sync_result = ::fsync(fd_);
+    } else if (sync_mode == SyncMode::FDATASYNC) {
+        sync_result = ::fdatasync(fd_);
+    }
+
+    if ((sync_mode == SyncMode::FSYNC || sync_mode == SyncMode::FDATASYNC) && sync_result != 0) {
+        spdlog::warn("{} failed: {}",
+                     sync_mode == SyncMode::FSYNC ? "fsync" : "fdatasync",
+                     strerror(errno));
     }
     
     ::close(fd_);
@@ -118,9 +150,11 @@ void WriteSession::Abort() {
 
 // DataStore 实现
 
-DataStore::DataStore(const std::string& data_dir, const std::string& tmp_dir)
+DataStore::DataStore(const std::string& data_dir, const std::string& tmp_dir,
+                     SyncMode sync_mode)
     : layout_(data_dir)
-    , tmp_dir_(tmp_dir) {
+    , tmp_dir_(tmp_dir)
+    , sync_mode_(sync_mode) {
 }
 
 Status DataStore::Init() {
@@ -150,8 +184,8 @@ Status DataStore::Init() {
         return status;
     }
     
-    spdlog::info("DataStore initialized, data_dir: {}, tmp_dir: {}", 
-        layout_.BaseDir(), tmp_dir_);
+    spdlog::info("DataStore initialized, data_dir: {}, tmp_dir: {}, sync_mode: {}",
+        layout_.BaseDir(), tmp_dir_, SyncModeToString(sync_mode_));
     
     return Status::OK();
 }
@@ -174,7 +208,7 @@ Result<std::unique_ptr<WriteSession>> DataStore::BeginWrite() {
 Result<std::string> DataStore::CommitWrite(std::unique_ptr<WriteSession> session,
                                             const std::string& expected_sha256) {
     // 完成写入并得到 CAS key
-    auto result = session->Finish();
+    auto result = session->Finish(sync_mode_);
     if (!result.ok()) {
         return result.status();
     }

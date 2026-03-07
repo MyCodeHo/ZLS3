@@ -9,6 +9,12 @@
 
 namespace minis3 {
 
+enum class SyncMode {
+    FSYNC,
+    FDATASYNC,
+    NONE
+};
+
 /**
  * 写入会话 - 用于流式写入
  */
@@ -33,7 +39,7 @@ public:
     /**
      * 完成写入，返回 CAS key
      */
-    Result<std::string> Finish();
+    Result<std::string> Finish(SyncMode sync_mode = SyncMode::FSYNC);
     
     /**
      * 取消写入（删除临时文件）
@@ -65,8 +71,12 @@ private:
  */
 class DataStore {
 public:
-    DataStore(const std::string& data_dir, const std::string& tmp_dir);
+    DataStore(const std::string& data_dir, const std::string& tmp_dir,
+              SyncMode sync_mode = SyncMode::FSYNC);
     ~DataStore() = default;
+
+    static SyncMode ParseSyncMode(const std::string& mode);
+    static const char* SyncModeToString(SyncMode mode);
     
     /**
      * 初始化（创建必要的目录）
@@ -144,6 +154,7 @@ public:
 private:
     CasLayout layout_;
     std::string tmp_dir_;
+    SyncMode sync_mode_;
 };
 
 } // namespace minis3

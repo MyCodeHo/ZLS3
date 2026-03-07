@@ -46,7 +46,8 @@ Status Server::Init() {
     spdlog::info("Initializing storage at {}...", config_.storage.data_dir);
     data_store_ = std::make_unique<DataStore>(
         config_.storage.data_dir,
-        config_.storage.tmp_dir
+        config_.storage.tmp_dir,
+        DataStore::ParseSyncMode(config_.storage.sync_mode)
     );
     
     auto store_status = data_store_->Init();

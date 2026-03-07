@@ -47,6 +47,13 @@ bool MySQLConnection::Connect(const MySQLConfig& config) {
         mysql_ = nullptr;
         return false;
     }
+
+    // 降低并发写入锁冲突风险（保持读一致性由业务层保证）
+    if (mysql_real_query(mysql_,
+                         "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED",
+                         sizeof("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED") - 1) != 0) {
+        spdlog::warn("Failed to set session isolation level READ COMMITTED: {}", mysql_error(mysql_));
+    }
     
     return true;
 }

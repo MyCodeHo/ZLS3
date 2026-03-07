@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <optional>
 #include <chrono>
+#include <unordered_map>
+#include <mutex>
 
 namespace minis3 {
 
@@ -347,6 +349,8 @@ public:
 
 private:
     MySQLPool& pool_;
+    mutable std::mutex bucket_cache_mutex_;
+    std::unordered_map<std::string, BucketInfo> bucket_cache_;
     
     // 辅助方法
     std::string Escape(const std::string& str);

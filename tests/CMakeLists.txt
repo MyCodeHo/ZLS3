@@ -40,3 +40,11 @@ if(GTest_FOUND)
 else()
     message(STATUS "GTest not found, skipping tests")
 endif()
+
+add_executable(bench_data_store_sync
+    perf/bench_data_store_sync.cpp
+)
+target_link_libraries(bench_data_store_sync
+    minis3_lib
+)
+target_include_directories(bench_data_store_sync PRIVATE ${PROJECT_SOURCE_DIR}/src)

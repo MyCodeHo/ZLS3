@@ -38,6 +38,7 @@ StorageConfig ParseStorageConfig(const YAML::Node& node) {
     
     config.data_dir = GetOrDefault<std::string>(node, "data_dir", config.data_dir);
     config.tmp_dir = GetOrDefault<std::string>(node, "tmp_dir", config.tmp_dir);
+    config.sync_mode = GetOrDefault<std::string>(node, "sync_mode", config.sync_mode);
     
     return config;
 }

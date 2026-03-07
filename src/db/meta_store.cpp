@@ -4,6 +4,7 @@
 #include "mysql_tx.h"
 #include <sstream>
 #include <iomanip>
+#include <thread>
 
 namespace minis3 {
 
@@ -29,6 +30,20 @@ std::string TimePointToMySQL(const std::chrono::system_clock::time_point& tp) {
     std::ostringstream ss;
     ss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
     return ss.str();
+}
+
+bool IsRetryableTxnError(const std::string& err) {
+    return err.find("Deadlock found") != std::string::npos ||
+           err.find("Lock wait timeout exceeded") != std::string::npos;
+}
+
+bool IsDuplicateKeyError(const std::string& err) {
+    return err.find("Duplicate entry") != std::string::npos;
+}
+
+void RetryBackoff(int attempt) {
+    const int delay_ms = 5 * (attempt + 1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(delay_ms));
 }
 }
 
@@ -64,17 +79,40 @@ Result<int64_t> MetaStore::CreateBucket(const std::string& name,
         return Result<int64_t>::Err(ErrorCode::DatabaseError, "No MySQL connection");
     }
     std::string sql = "INSERT INTO buckets(name) VALUES('" + conn->Escape(name) + "')";
-    if (!conn->Execute(sql)) {
+        if (!conn->Execute(sql)) {
         std::string err = conn->LastError();
         if (err.find("Duplicate") != std::string::npos) {
             return Result<int64_t>::Err(ErrorCode::BucketAlreadyExists, err);
         }
         return Result<int64_t>::Err(ErrorCode::DatabaseError, err);
     }
-    return Result<int64_t>::Ok(static_cast<int64_t>(conn->LastInsertId()));
+        BucketInfo info{};
+        info.id = static_cast<int64_t>(conn->LastInsertId());
+        info.name = name;
+        info.owner_id = owner_id;
+        info.region = region.empty() ? "default" : region;
+        info.acl = acl.empty() ? "private" : acl;
+        info.versioning_enabled = false;
+        info.created_at = std::chrono::system_clock::now();
+        info.updated_at = info.created_at;
+
+        {
+            std::lock_guard<std::mutex> lock(bucket_cache_mutex_);
+            bucket_cache_[name] = info;
+        }
+
+        return Result<int64_t>::Ok(info.id);
 }
 
 Result<BucketInfo> MetaStore::GetBucket(const std::string& name) {
+        {
+            std::lock_guard<std::mutex> lock(bucket_cache_mutex_);
+            auto it = bucket_cache_.find(name);
+            if (it != bucket_cache_.end()) {
+                return Result<BucketInfo>::Ok(it->second);
+            }
+        }
+
     // 按名称查询 bucket
     auto conn = pool_.GetConnection();
     if (!conn) {
@@ -100,6 +138,12 @@ Result<BucketInfo> MetaStore::GetBucket(const std::string& name) {
     info.created_at = ParseTimestamp(row[2]);
     info.updated_at = info.created_at;
     mysql_free_result(res);
+
+    {
+        std::lock_guard<std::mutex> lock(bucket_cache_mutex_);
+        bucket_cache_[info.name] = info;
+    }
+
     return Result<BucketInfo>::Ok(info);
 }
 
@@ -158,6 +202,14 @@ Result<std::vector<BucketInfo>> MetaStore::ListBuckets(const std::string& owner_
         buckets.push_back(std::move(info));
     }
     mysql_free_result(res);
+
+    {
+        std::lock_guard<std::mutex> lock(bucket_cache_mutex_);
+        for (const auto& bucket : buckets) {
+            bucket_cache_[bucket.name] = bucket;
+        }
+    }
+
     return Result<std::vector<BucketInfo>>::Ok(std::move(buckets));
 }
 
@@ -174,6 +226,12 @@ Status MetaStore::DeleteBucket(const std::string& name) {
     if (conn->AffectedRows() == 0) {
         return Status::Error(ErrorCode::NoSuchBucket, "Bucket not found");
     }
+
+    {
+        std::lock_guard<std::mutex> lock(bucket_cache_mutex_);
+        bucket_cache_.erase(name);
+    }
+
     return Status::OK();
 }
 
@@ -249,79 +307,161 @@ Result<std::optional<std::string>> MetaStore::PutObjectWithRefCount(
         return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, "No MySQL connection");
     }
 
-    Transaction tx(conn);
-
+    constexpr int kMaxRetries = 3;
     std::string key_esc = conn->Escape(key);
     std::string cas_esc = conn->Escape(sha256_hash);
     std::string etag_esc = conn->Escape(etag);
     std::string ct_esc = conn->Escape(content_type);
 
-    // 读取旧 cas_key（加锁）
-    std::string old_cas;
-    {
-        std::string sql = "SELECT cas_key FROM objects WHERE bucket_id=" + std::to_string(bucket_id) +
-                          " AND object_key='" + key_esc + "' FOR UPDATE";
-        MYSQL_RES* res = tx.Query(sql);
-        if (!res) {
-            return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, conn->LastError());
+    for (int attempt = 0; attempt < kMaxRetries; ++attempt) {
+        // 快速路径：新对象 key 直接插入，避免 FOR UPDATE
+        {
+            Transaction tx_fast(conn);
+
+            std::string inc_sql = "INSERT INTO cas_blobs(cas_key, size, ref_count) VALUES('" + cas_esc +
+                                  "', " + std::to_string(size) + ", 1) "
+                                  "ON DUPLICATE KEY UPDATE ref_count = ref_count + 1, updated_at=CURRENT_TIMESTAMP";
+            if (!tx_fast.Execute(inc_sql)) {
+                std::string err = conn->LastError();
+                if (attempt + 1 < kMaxRetries && IsRetryableTxnError(err)) {
+                    RetryBackoff(attempt);
+                    continue;
+                }
+                return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, err);
+            }
+
+            std::string insert_object =
+                "INSERT INTO objects(bucket_id, object_key, cas_key, size, content_type, etag) VALUES(" +
+                std::to_string(bucket_id) + ", '" + key_esc + "', '" + cas_esc + "', " +
+                std::to_string(size) + ", '" + ct_esc + "', '" + etag_esc + "')";
+            if (tx_fast.Execute(insert_object)) {
+                if (!tx_fast.Commit()) {
+                    std::string err = conn->LastError();
+                    if (attempt + 1 < kMaxRetries && IsRetryableTxnError(err)) {
+                        RetryBackoff(attempt);
+                        continue;
+                    }
+                    return Result<std::optional<std::string>>::Err(
+                        ErrorCode::DatabaseError,
+                        err.empty() ? "Failed to commit transaction" : err);
+                }
+                return Result<std::optional<std::string>>::Ok(std::nullopt);
+            }
+
+            std::string err = conn->LastError();
+            if (!IsDuplicateKeyError(err)) {
+                if (attempt + 1 < kMaxRetries && IsRetryableTxnError(err)) {
+                    RetryBackoff(attempt);
+                    continue;
+                }
+                return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, err);
+            }
+            // duplicate object key：回滚快速路径增量，走覆盖慢路径
         }
-        MYSQL_ROW row = mysql_fetch_row(res);
-        if (row && row[0]) {
-            old_cas = row[0];
+
+        Transaction tx(conn);
+
+        // 读取旧 cas_key（加锁）
+        std::string old_cas;
+        {
+            std::string sql = "SELECT cas_key FROM objects WHERE bucket_id=" + std::to_string(bucket_id) +
+                              " AND object_key='" + key_esc + "' FOR UPDATE";
+            MYSQL_RES* res = tx.Query(sql);
+            if (!res) {
+                std::string err = conn->LastError();
+                if (attempt + 1 < kMaxRetries && IsRetryableTxnError(err)) {
+                    RetryBackoff(attempt);
+                    continue;
+                }
+                return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, err);
+            }
+            MYSQL_ROW row = mysql_fetch_row(res);
+            if (row && row[0]) {
+                old_cas = row[0];
+            }
+            mysql_free_result(res);
         }
-        mysql_free_result(res);
+
+        bool should_inc_new = old_cas.empty() || old_cas != sha256_hash;
+
+        // 新 cas_key 引用 +1
+        if (should_inc_new) {
+            std::string sql = "INSERT INTO cas_blobs(cas_key, size, ref_count) VALUES('" + cas_esc +
+                              "', " + std::to_string(size) + ", 1) "
+                              "ON DUPLICATE KEY UPDATE ref_count = ref_count + 1, updated_at=CURRENT_TIMESTAMP";
+            if (!tx.Execute(sql)) {
+                std::string err = conn->LastError();
+                if (attempt + 1 < kMaxRetries && IsRetryableTxnError(err)) {
+                    RetryBackoff(attempt);
+                    continue;
+                }
+                return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, err);
+            }
+        }
+
+        // 旧 cas_key 引用 -1，若为 0 则返回给 GC
+        std::optional<std::string> gc_candidate;
+        if (!old_cas.empty() && old_cas != sha256_hash) {
+            std::string old_esc = conn->Escape(old_cas);
+            std::string dec_sql = "UPDATE cas_blobs SET ref_count = IF(ref_count>0, ref_count-1, 0), "
+                                  "updated_at=CURRENT_TIMESTAMP WHERE cas_key='" + old_esc + "'";
+            if (!tx.Execute(dec_sql)) {
+                std::string err = conn->LastError();
+                if (attempt + 1 < kMaxRetries && IsRetryableTxnError(err)) {
+                    RetryBackoff(attempt);
+                    continue;
+                }
+                return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, err);
+            }
+
+            std::string sel_sql = "SELECT ref_count FROM cas_blobs WHERE cas_key='" + old_esc + "' LIMIT 1";
+            MYSQL_RES* res = tx.Query(sel_sql);
+            if (!res) {
+                std::string err = conn->LastError();
+                if (attempt + 1 < kMaxRetries && IsRetryableTxnError(err)) {
+                    RetryBackoff(attempt);
+                    continue;
+                }
+                return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, err);
+            }
+            MYSQL_ROW row = mysql_fetch_row(res);
+            if (row && row[0] && std::stoi(row[0]) == 0) {
+                gc_candidate = old_cas;
+            }
+            mysql_free_result(res);
+        }
+
+        // 写入/更新对象元数据
+        std::string upsert = "INSERT INTO objects(bucket_id, object_key, cas_key, size, content_type, etag) VALUES(" +
+                             std::to_string(bucket_id) + ", '" + key_esc + "', '" + cas_esc + "', " +
+                             std::to_string(size) + ", '" + ct_esc + "', '" + etag_esc + "') "
+                             "ON DUPLICATE KEY UPDATE cas_key=VALUES(cas_key), size=VALUES(size), "
+                             "content_type=VALUES(content_type), etag=VALUES(etag)";
+        if (!tx.Execute(upsert)) {
+            std::string err = conn->LastError();
+            if (attempt + 1 < kMaxRetries && IsRetryableTxnError(err)) {
+                RetryBackoff(attempt);
+                continue;
+            }
+            return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, err);
+        }
+
+        // 提交事务
+        if (!tx.Commit()) {
+            std::string err = conn->LastError();
+            if (attempt + 1 < kMaxRetries && IsRetryableTxnError(err)) {
+                RetryBackoff(attempt);
+                continue;
+            }
+            return Result<std::optional<std::string>>::Err(
+                ErrorCode::DatabaseError,
+                err.empty() ? "Failed to commit transaction" : err);
+        }
+
+        return Result<std::optional<std::string>>::Ok(gc_candidate);
     }
 
-    bool should_inc_new = old_cas.empty() || old_cas != sha256_hash;
-
-    // 新 cas_key 引用 +1
-    if (should_inc_new) {
-        std::string sql = "INSERT INTO cas_blobs(cas_key, size, ref_count) VALUES('" + cas_esc +
-                          "', " + std::to_string(size) + ", 1) "
-                          "ON DUPLICATE KEY UPDATE ref_count = ref_count + 1, updated_at=CURRENT_TIMESTAMP";
-        if (!tx.Execute(sql)) {
-            return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, conn->LastError());
-        }
-    }
-
-    // 旧 cas_key 引用 -1，若为 0 则返回给 GC
-    std::optional<std::string> gc_candidate;
-    if (!old_cas.empty() && old_cas != sha256_hash) {
-        std::string old_esc = conn->Escape(old_cas);
-        std::string dec_sql = "UPDATE cas_blobs SET ref_count = IF(ref_count>0, ref_count-1, 0), "
-                              "updated_at=CURRENT_TIMESTAMP WHERE cas_key='" + old_esc + "'";
-        if (!tx.Execute(dec_sql)) {
-            return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, conn->LastError());
-        }
-
-        std::string sel_sql = "SELECT ref_count FROM cas_blobs WHERE cas_key='" + old_esc + "' LIMIT 1";
-        MYSQL_RES* res = tx.Query(sel_sql);
-        if (!res) {
-            return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, conn->LastError());
-        }
-        MYSQL_ROW row = mysql_fetch_row(res);
-        if (row && row[0] && std::stoi(row[0]) == 0) {
-            gc_candidate = old_cas;
-        }
-        mysql_free_result(res);
-    }
-
-    // 写入/更新对象元数据
-    std::string upsert = "INSERT INTO objects(bucket_id, object_key, cas_key, size, content_type, etag) VALUES(" +
-                         std::to_string(bucket_id) + ", '" + key_esc + "', '" + cas_esc + "', " +
-                         std::to_string(size) + ", '" + ct_esc + "', '" + etag_esc + "') "
-                         "ON DUPLICATE KEY UPDATE cas_key=VALUES(cas_key), size=VALUES(size), "
-                         "content_type=VALUES(content_type), etag=VALUES(etag)";
-    if (!tx.Execute(upsert)) {
-        return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, conn->LastError());
-    }
-
-    // 提交事务
-    if (!tx.Commit()) {
-        return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, "Failed to commit transaction");
-    }
-
-    return Result<std::optional<std::string>>::Ok(gc_candidate);
+    return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, "Transaction retry exhausted");
 }
 
 Result<ObjectInfo> MetaStore::GetObject(int64_t bucket_id, const std::string& key) {
@@ -802,74 +942,112 @@ Result<std::optional<std::string>> MetaStore::PutPartWithRefCount(const std::str
         return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, "No MySQL connection");
     }
 
-    Transaction tx(conn);
+    constexpr int kMaxRetries = 3;
     std::string upload_esc = conn->Escape(upload_id);
     std::string cas_esc = conn->Escape(sha256_hash);
     std::string etag_esc = conn->Escape(etag);
 
-    // 查询旧 cas_key（加锁）
-    std::string old_cas;
-    {
-        std::string sql = "SELECT cas_key FROM multipart_parts WHERE upload_id='" + upload_esc +
-                          "' AND part_number=" + std::to_string(part_number) + " FOR UPDATE";
-        MYSQL_RES* res = tx.Query(sql);
-        if (!res) {
-            return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, conn->LastError());
+    for (int attempt = 0; attempt < kMaxRetries; ++attempt) {
+        Transaction tx(conn);
+
+        // 查询旧 cas_key（加锁）
+        std::string old_cas;
+        {
+            std::string sql = "SELECT cas_key FROM multipart_parts WHERE upload_id='" + upload_esc +
+                              "' AND part_number=" + std::to_string(part_number) + " FOR UPDATE";
+            MYSQL_RES* res = tx.Query(sql);
+            if (!res) {
+                std::string err = conn->LastError();
+                if (attempt + 1 < kMaxRetries && IsRetryableTxnError(err)) {
+                    RetryBackoff(attempt);
+                    continue;
+                }
+                return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, err);
+            }
+            MYSQL_ROW row = mysql_fetch_row(res);
+            if (row && row[0]) {
+                old_cas = row[0];
+            }
+            mysql_free_result(res);
         }
-        MYSQL_ROW row = mysql_fetch_row(res);
-        if (row && row[0]) {
-            old_cas = row[0];
+
+        // 新 cas_key 引用 +1
+        bool should_inc_new = old_cas.empty() || old_cas != sha256_hash;
+        if (should_inc_new) {
+            std::string sql = "INSERT INTO cas_blobs(cas_key, size, ref_count) VALUES('" + cas_esc +
+                              "', " + std::to_string(size) + ", 1) "
+                              "ON DUPLICATE KEY UPDATE ref_count = ref_count + 1, updated_at=CURRENT_TIMESTAMP";
+            if (!tx.Execute(sql)) {
+                std::string err = conn->LastError();
+                if (attempt + 1 < kMaxRetries && IsRetryableTxnError(err)) {
+                    RetryBackoff(attempt);
+                    continue;
+                }
+                return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, err);
+            }
         }
-        mysql_free_result(res);
+
+        // 旧 cas_key 引用 -1，若为 0 返回给 GC
+        std::optional<std::string> gc_candidate;
+        if (!old_cas.empty() && old_cas != sha256_hash) {
+            std::string old_esc = conn->Escape(old_cas);
+            std::string dec_sql = "UPDATE cas_blobs SET ref_count = IF(ref_count>0, ref_count-1, 0), "
+                                  "updated_at=CURRENT_TIMESTAMP WHERE cas_key='" + old_esc + "'";
+            if (!tx.Execute(dec_sql)) {
+                std::string err = conn->LastError();
+                if (attempt + 1 < kMaxRetries && IsRetryableTxnError(err)) {
+                    RetryBackoff(attempt);
+                    continue;
+                }
+                return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, err);
+            }
+            std::string sel_sql = "SELECT ref_count FROM cas_blobs WHERE cas_key='" + old_esc + "' LIMIT 1";
+            MYSQL_RES* res = tx.Query(sel_sql);
+            if (!res) {
+                std::string err = conn->LastError();
+                if (attempt + 1 < kMaxRetries && IsRetryableTxnError(err)) {
+                    RetryBackoff(attempt);
+                    continue;
+                }
+                return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, err);
+            }
+            MYSQL_ROW row = mysql_fetch_row(res);
+            if (row && row[0] && std::stoi(row[0]) == 0) {
+                gc_candidate = old_cas;
+            }
+            mysql_free_result(res);
+        }
+
+        // 写入/更新分片记录
+        std::string upsert = "INSERT INTO multipart_parts(upload_id, part_number, cas_key, size, etag) VALUES('" +
+                             upload_esc + "', " + std::to_string(part_number) + ", '" + cas_esc + "', " +
+                             std::to_string(size) + ", '" + etag_esc + "') "
+                             "ON DUPLICATE KEY UPDATE cas_key=VALUES(cas_key), size=VALUES(size), etag=VALUES(etag)";
+        if (!tx.Execute(upsert)) {
+            std::string err = conn->LastError();
+            if (attempt + 1 < kMaxRetries && IsRetryableTxnError(err)) {
+                RetryBackoff(attempt);
+                continue;
+            }
+            return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, err);
+        }
+
+        // 提交事务
+        if (!tx.Commit()) {
+            std::string err = conn->LastError();
+            if (attempt + 1 < kMaxRetries && IsRetryableTxnError(err)) {
+                RetryBackoff(attempt);
+                continue;
+            }
+            return Result<std::optional<std::string>>::Err(
+                ErrorCode::DatabaseError,
+                err.empty() ? "Failed to commit transaction" : err);
+        }
+
+        return Result<std::optional<std::string>>::Ok(gc_candidate);
     }
 
-    // 新 cas_key 引用 +1
-    bool should_inc_new = old_cas.empty() || old_cas != sha256_hash;
-    if (should_inc_new) {
-        std::string sql = "INSERT INTO cas_blobs(cas_key, size, ref_count) VALUES('" + cas_esc +
-                          "', " + std::to_string(size) + ", 1) "
-                          "ON DUPLICATE KEY UPDATE ref_count = ref_count + 1, updated_at=CURRENT_TIMESTAMP";
-        if (!tx.Execute(sql)) {
-            return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, conn->LastError());
-        }
-    }
-
-    // 旧 cas_key 引用 -1，若为 0 返回给 GC
-    std::optional<std::string> gc_candidate;
-    if (!old_cas.empty() && old_cas != sha256_hash) {
-        std::string old_esc = conn->Escape(old_cas);
-        std::string dec_sql = "UPDATE cas_blobs SET ref_count = IF(ref_count>0, ref_count-1, 0), "
-                              "updated_at=CURRENT_TIMESTAMP WHERE cas_key='" + old_esc + "'";
-        if (!tx.Execute(dec_sql)) {
-            return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, conn->LastError());
-        }
-        std::string sel_sql = "SELECT ref_count FROM cas_blobs WHERE cas_key='" + old_esc + "' LIMIT 1";
-        MYSQL_RES* res = tx.Query(sel_sql);
-        if (!res) {
-            return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, conn->LastError());
-        }
-        MYSQL_ROW row = mysql_fetch_row(res);
-        if (row && row[0] && std::stoi(row[0]) == 0) {
-            gc_candidate = old_cas;
-        }
-        mysql_free_result(res);
-    }
-
-    // 写入/更新分片记录
-    std::string upsert = "INSERT INTO multipart_parts(upload_id, part_number, cas_key, size, etag) VALUES('" +
-                         upload_esc + "', " + std::to_string(part_number) + ", '" + cas_esc + "', " +
-                         std::to_string(size) + ", '" + etag_esc + "') "
-                         "ON DUPLICATE KEY UPDATE cas_key=VALUES(cas_key), size=VALUES(size), etag=VALUES(etag)";
-    if (!tx.Execute(upsert)) {
-        return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, conn->LastError());
-    }
-
-    // 提交事务
-    if (!tx.Commit()) {
-        return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, "Failed to commit transaction");
-    }
-
-    return Result<std::optional<std::string>>::Ok(gc_candidate);
+    return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, "Transaction retry exhausted");
 }
 
 Result<int64_t> MetaStore::PutPart(const std::string& upload_id,

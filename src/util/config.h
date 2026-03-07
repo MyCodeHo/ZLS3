@@ -25,6 +25,7 @@ struct ServerConfig {
 struct StorageConfig {
     std::string data_dir = "/var/lib/minis3/data";
     std::string tmp_dir = "/var/lib/minis3/tmp";
+    std::string sync_mode = "fsync";  // fsync | fdatasync | none
 };
 
 /**

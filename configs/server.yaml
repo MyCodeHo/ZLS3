@@ -12,6 +12,7 @@ server:
 storage:
   data_dir: "/var/lib/minis3/data"
   tmp_dir: "/var/lib/minis3/tmp"
+  sync_mode: "fsync"   # fsync | fdatasync | none
 
 # MySQL 配置
 mysql:

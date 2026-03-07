@@ -9,6 +9,7 @@ server:
 storage:
   data_dir: "/media/zpw/24804BB6804B8CEC/minis3_nvme/data"
   tmp_dir: "/media/zpw/24804BB6804B8CEC/minis3_nvme/tmp"
+  sync_mode: "fdatasync"
 
 mysql:
   host: "127.0.0.1"
