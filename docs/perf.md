@@ -79,6 +79,17 @@
 - GET 10MB：约 1506.8 MB/s
 - GET 100MB：约 4089.7 MB/s
 
+#### 3) 冷缓存下载（复现）
+
+测试流程：生成 100MB 文件 -> 上传到 `bench_cold_1` -> 清空页缓存 -> 下载一次并测量（使用仓库脚本）。
+
+实测（2026-03-05，本机，root 清页缓存后执行）：
+
+- 上传（单次，`bench_upload.sh`）: 总耗时 3.2075s，吞吐 ~31.17 MB/s（写入受磁盘限制）
+- 冷缓存下载（`bench_download.sh default bench_cold_1 1 1`）: Total time = 0.027733715s，Throughput = 3605.71 MB/s
+
+说明：尽管已执行 `echo 3 | sudo tee /proc/sys/vm/drop_caches`，下载仍然呈现远超物理盘的吞吐，说明同机回环、内核/驱动层缓存或 sendfile/零拷贝路径仍然可能使读取路径绕过慢盘瓶颈（或测量受其他缓存层影响）。建议在跨主机（client != server）和使用独立网络路径的场景下重复验证真实读取带宽。
+
 补充（MySQL 查询基线，30 次）：
 
 - `SELECT cas_key FROM objects ...`：P50 8.45ms，P95 9.18ms，平均 8.43ms
@@ -124,6 +135,59 @@
 - 单独统计服务端处理时延（不含客户端排队时间），与端到端时延分开展示。
 
 ## 性能优化
+
+## 磁盘基准测试（本机，dd + fio）
+
+测试命令（在仓库根目录执行）：
+
+```bash
+# 顺序读写（dd，direct + fdatasync）
+sync; time dd if=/dev/zero of=/tmp/minis3/dd_test bs=1M count=1024 oflag=direct conv=fdatasync
+time dd if=/tmp/minis3/dd_test of=/dev/null bs=1M iflag=direct
+
+# 随机读写（fio, 4k，iodepth=16）
+fio --name=randwrite1 --filename=/tmp/minis3/fio_test --size=512M --bs=4k --rw=randwrite --iodepth=16 --direct=1 --numjobs=1 --time_based --runtime=10 --group_reporting
+fio --name=randread1  --filename=/tmp/minis3/fio_test --size=512M --bs=4k --rw=randread  --iodepth=16 --direct=1 --numjobs=1 --time_based --runtime=10 --group_reporting
+rm -f /tmp/minis3/fio_test /tmp/minis3/dd_test
+```
+
+实测结果（2026-03-05，本机）摘要：
+
+- 顺序写（dd, 1GiB, direct+fdatasync）：约 179 MB/s
+- 顺序读（dd, 1GiB, direct）：约 193 MB/s
+- 随机写（fio, 4k, iodepth=16, 1 job）：约 1.08 MB/s（≈ 277 IOPS）
+- 随机读（fio, 4k, iodepth=16, 1 job）：约 0.55 MB/s（≈ 138 IOPS）
+
+说明：顺序吞吐 ~180–195 MB/s 与 `PUT` 路径中观测到的 ~31 MB/s 写入不同，后者受写入策略（fsync/rename）和服务器实现（临时文件 + 强制落盘）影响更大；随机 IOPS 非常低（百级 IOPS），这对大量小对象随机写场景有显著影响，尤其在使用旋转盘时。
+
+## NVMe 实测（2026-03-05）
+
+测试前提：
+
+- 将 `configs/server.local.yaml` 的 `storage.data_dir/tmp_dir` 切到 NVMe 挂载：`/media/zpw/24804BB6804B8CEC/minis3_nvme/{data,tmp}`
+- 设备信息：`nvme0n1`（`ROTA=0`）
+
+### 1) 项目吞吐（MiniS3）
+
+单次 100MB 对象：
+
+- PUT（`bench_nvme_put_single`）：`TIME=1.359249s`，约 `77.14 MB/s`（`SPEED_Bps=77143775`）
+- GET（`bench_nvme_100`）：`TIME=0.020309s`，约 `5163.11 MB/s`（`SPEED_Bps=5163109951`，同机缓存/回环特征明显）
+
+并发压测（脚本）：
+
+- `./scripts/bench_upload.sh ... 100MB 2x5`：`108.73 MB/s`（稳定一轮全成功）
+- `./scripts/bench_download.sh ... bench_nvme_100 2x5`：`6765.47 MB/s`
+
+### 2) NVMe 裸盘限制吞吐（dd + fio）
+
+- 顺序写（dd, 1GiB, direct+fdatasync）：约 `2.2 GB/s`
+- 顺序读（dd, 1GiB, direct）：约 `2.3 GB/s`
+- 随机写（fio, 4k, iodepth=16, 1 job）：约 `200 MiB/s`（≈ `51.1k IOPS`）
+- 随机读（fio, 4k, iodepth=16, 1 job）：约 `72.4 MiB/s`（≈ `18.5k IOPS`）
+
+结论：切到 NVMe 后，项目 PUT 吞吐从此前机械盘量级显著提升（100MB 并发压测约到 `108.73 MB/s`），但仍明显低于 NVMe 裸盘上限，说明应用路径中的 `fsync + rename + 元数据事务` 仍是主要限制；GET 继续受同机缓存/回环加速，不能直接代表跨主机真实读盘吞吐。
+
 
 ### 系统配置
 

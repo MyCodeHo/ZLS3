@@ -7,8 +7,8 @@ server:
   send_buffer_size: 1048576
 
 storage:
-  data_dir: "/tmp/minis3/data"
-  tmp_dir: "/tmp/minis3/tmp"
+  data_dir: "/media/zpw/24804BB6804B8CEC/minis3_nvme/data"
+  tmp_dir: "/media/zpw/24804BB6804B8CEC/minis3_nvme/tmp"
 
 mysql:
   host: "127.0.0.1"
