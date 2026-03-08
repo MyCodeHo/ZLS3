@@ -101,6 +101,7 @@ set(MINIS3_SOURCES
     src/util/fs.cpp
     src/util/status.cpp
     src/util/metrics.cpp
+    src/util/redis_cache.cpp
     
     # net/buffer
     src/net/buffer/byte_buffer.cpp

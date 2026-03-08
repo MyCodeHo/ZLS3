@@ -9,8 +9,11 @@
 #include <chrono>
 #include <unordered_map>
 #include <mutex>
+#include <memory>
 
 namespace minis3 {
+
+class RedisCache;
 
 // ===== 数据模型 =====
 
@@ -103,6 +106,10 @@ class MetaStore {
 public:
     explicit MetaStore(MySQLPool& pool);
     ~MetaStore() = default;
+
+    void SetRedisCache(std::shared_ptr<RedisCache> redis_cache) {
+        redis_cache_ = std::move(redis_cache);
+    }
     
     // ===== Bucket 操作 =====
     
@@ -354,6 +361,7 @@ public:
 
 private:
     MySQLPool& pool_;
+    std::shared_ptr<RedisCache> redis_cache_;
     mutable std::mutex bucket_cache_mutex_;
     std::unordered_map<std::string, BucketInfo> bucket_cache_;
     

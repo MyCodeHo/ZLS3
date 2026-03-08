@@ -43,6 +43,20 @@ struct MySQLConfig {
 };
 
 /**
+ * Redis 配置
+ */
+struct RedisConfig {
+    bool enabled = false;
+    std::string host = "127.0.0.1";
+    uint16_t port = 6379;
+    std::string password;
+    int db = 0;
+    int connect_timeout_ms = 500;
+    int command_timeout_ms = 1000;
+    int object_meta_ttl_seconds = 120;
+};
+
+/**
  * 认证配置
  */
 struct AuthConfig {
@@ -106,6 +120,7 @@ struct Config {
     ServerConfig server;
     StorageConfig storage;
     MySQLConfig mysql;
+    RedisConfig redis;
     AuthConfig auth;
     LimitsConfig limits;
     MultipartConfig multipart;

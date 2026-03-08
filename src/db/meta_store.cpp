@@ -1,7 +1,10 @@
 #include "meta_store.h"
 #include "../util/logging.h"
+#include "../util/crypto.h"
+#include "../util/redis_cache.h"
 #include "../util/uuid.h"
 #include "mysql_tx.h"
+#include <nlohmann/json.hpp>
 #include <sstream>
 #include <iomanip>
 #include <thread>
@@ -9,6 +12,8 @@
 namespace minis3 {
 
 namespace {
+using json = nlohmann::json;
+
 std::chrono::system_clock::time_point ParseMysqlTime(const char* str) {
     // 解析 MySQL DATETIME 字符串为 time_point
     if (!str) {
@@ -44,6 +49,52 @@ bool IsDuplicateKeyError(const std::string& err) {
 void RetryBackoff(int attempt) {
     const int delay_ms = 5 * (attempt + 1);
     std::this_thread::sleep_for(std::chrono::milliseconds(delay_ms));
+}
+
+std::string ObjectMetaCacheKey(int64_t bucket_id, const std::string& key) {
+    return "objmeta:" + std::to_string(bucket_id) + ":" + Crypto::SHA256(key);
+}
+
+std::string SerializeObjectInfo(const ObjectInfo& info) {
+    json j = {
+        {"id", info.id},
+        {"bucket_id", info.bucket_id},
+        {"key", info.key},
+        {"cas_key", info.sha256_hash},
+        {"size", info.size},
+        {"etag", info.etag},
+        {"content_type", info.content_type},
+        {"created_at", std::chrono::system_clock::to_time_t(info.created_at)}
+    };
+    return j.dump();
+}
+
+bool DeserializeObjectInfo(const std::string& payload, ObjectInfo& info) {
+    try {
+        json j = json::parse(payload);
+        info.id = j.value("id", 0LL);
+        info.bucket_id = j.value("bucket_id", 0LL);
+        info.key = j.value("key", "");
+        info.sha256_hash = j.value("cas_key", "");
+        info.size = j.value("size", 0LL);
+        info.etag = j.value("etag", "");
+        info.content_type = j.value("content_type", "application/octet-stream");
+        std::time_t created_ts = static_cast<std::time_t>(j.value("created_at", 0LL));
+        if (created_ts > 0) {
+            info.created_at = std::chrono::system_clock::from_time_t(created_ts);
+        } else {
+            info.created_at = std::chrono::system_clock::now();
+        }
+        info.version_id = "";
+        info.is_latest = true;
+        info.is_delete_marker = false;
+        info.storage_class = "standard";
+        info.metadata_json = "{}";
+        info.owner_id = "";
+        return !info.sha256_hash.empty();
+    } catch (...) {
+        return false;
+    }
 }
 }
 
@@ -458,6 +509,20 @@ Result<std::optional<std::string>> MetaStore::PutObjectWithRefCount(
                 err.empty() ? "Failed to commit transaction" : err);
         }
 
+        if (redis_cache_ && redis_cache_->Enabled()) {
+            ObjectInfo cache_info{};
+            cache_info.id = 0;
+            cache_info.bucket_id = bucket_id;
+            cache_info.key = key;
+            cache_info.sha256_hash = sha256_hash;
+            cache_info.size = size;
+            cache_info.etag = etag;
+            cache_info.content_type = content_type;
+            cache_info.created_at = std::chrono::system_clock::now();
+            std::string cache_key = ObjectMetaCacheKey(bucket_id, key);
+            redis_cache_->SetEx(cache_key, redis_cache_->ObjectMetaTtlSeconds(), SerializeObjectInfo(cache_info));
+        }
+
         return Result<std::optional<std::string>>::Ok(gc_candidate);
     }
 
@@ -465,6 +530,18 @@ Result<std::optional<std::string>> MetaStore::PutObjectWithRefCount(
 }
 
 Result<ObjectInfo> MetaStore::GetObject(int64_t bucket_id, const std::string& key) {
+    if (redis_cache_ && redis_cache_->Enabled()) {
+        std::string cache_key = ObjectMetaCacheKey(bucket_id, key);
+        auto cache_result = redis_cache_->Get(cache_key);
+        if (cache_result.ok() && cache_result.value().has_value()) {
+            ObjectInfo cached_info{};
+            if (DeserializeObjectInfo(*cache_result.value(), cached_info)) {
+                return Result<ObjectInfo>::Ok(std::move(cached_info));
+            }
+            redis_cache_->Del(cache_key);
+        }
+    }
+
     // 查询对象元数据
     auto conn = pool_.GetConnection();
     if (!conn) {
@@ -497,6 +574,12 @@ Result<ObjectInfo> MetaStore::GetObject(int64_t bucket_id, const std::string& ke
     info.metadata_json = "{}";
     info.owner_id = "";
     mysql_free_result(res);
+
+    if (redis_cache_ && redis_cache_->Enabled()) {
+        std::string cache_key = ObjectMetaCacheKey(bucket_id, key);
+        redis_cache_->SetEx(cache_key, redis_cache_->ObjectMetaTtlSeconds(), SerializeObjectInfo(info));
+    }
+
     return Result<ObjectInfo>::Ok(info);
 }
 
@@ -641,6 +724,10 @@ Result<std::optional<std::string>> MetaStore::DeleteObjectWithRefCount(int64_t b
     // 提交事务
     if (!tx.Commit()) {
         return Result<std::optional<std::string>>::Err(ErrorCode::DatabaseError, "Failed to commit transaction");
+    }
+
+    if (redis_cache_ && redis_cache_->Enabled()) {
+        redis_cache_->Del(ObjectMetaCacheKey(bucket_id, key));
     }
 
     return Result<std::optional<std::string>>::Ok(gc_candidate);

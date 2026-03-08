@@ -22,6 +22,16 @@ mysql:
   connect_timeout: 5
   read_timeout: 30
 
+redis:
+  enabled: true
+  host: "redis"
+  port: 6379
+  password: ""
+  db: 0
+  connect_timeout_ms: 500
+  command_timeout_ms: 1000
+  object_meta_ttl_seconds: 120
+
 # 认证配置
 auth:
   enabled: true

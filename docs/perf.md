@@ -1021,3 +1021,193 @@ storage:
   - `integration_tests` 通过。
 
 结论：本轮新增修复已通过现有回归测试，未引入可见构建或测试回归。
+
+---
+
+## 第七轮修复与优化（Redis 元数据缓存实验）
+
+目标：验证在不改变存储一致性语义的前提下，引入 Redis 作为对象元数据读缓存，是否能提升 GET 路径性能。
+
+### 实现内容
+
+1) 新增可选 Redis 配置（默认可关闭）
+
+- 在 `Config` 中增加 `redis` 配置段：`enabled/host/port/password/db/connect_timeout_ms/command_timeout_ms/object_meta_ttl_seconds`。
+- 当 `redis.enabled=false` 时，系统行为与原先一致。
+
+2) 新增轻量 Redis 客户端（无额外三方 C++ 依赖）
+
+- 新增 `src/util/redis_cache.h/.cpp`，实现最小能力集合：`Init/Get/SetEx/Del`。
+- 协议实现采用 RESP，支持 `AUTH`、`SELECT`、`PING`、`GET`、`SET EX`、`DEL`。
+
+3) MetaStore 接入缓存（对象元数据）
+
+- `GetObject`：先查 Redis，未命中再查 MySQL，并回填缓存。
+- `PutObjectWithRefCount`：事务提交后更新缓存。
+- `DeleteObjectWithRefCount`：事务提交后删除缓存。
+
+4) Server 装配与降级策略
+
+- `Server::Init` 在 `redis.enabled=true` 时尝试连接 Redis；
+- Redis 初始化失败仅告警并自动降级，不阻断服务启动。
+
+5) 配置与部署文件更新
+
+- `configs/server.example.yaml` 增加 Redis 示例配置（默认 `enabled: false`）。
+- `configs/server.local.yaml` 增加 Redis 本地配置。
+- `docker/server.yaml` 增加 Redis 配置（host=`redis`）。
+- `docker/docker-compose.yaml` 增加 `redis` 服务（含 healthcheck）并让 `minis3` 依赖其就绪。
+
+### 落地文件
+
+- `src/util/config.h`
+- `src/util/config.cpp`
+- `src/util/redis_cache.h`
+- `src/util/redis_cache.cpp`
+- `src/db/meta_store.h`
+- `src/db/meta_store.cpp`
+- `src/server/server.h`
+- `src/server/server.cpp`
+- `CMakeLists.txt`
+- `configs/server.example.yaml`
+- `configs/server.local.yaml`
+- `docker/server.yaml`
+- `docker/docker-compose.yaml`
+
+### 验证与性能对比
+
+构建与测试：
+
+1. `Build_CMakeTools`：通过；
+2. `RunCtest_CMakeTools`：`unit_tests`、`integration_tests` 通过。
+
+对比测试方法（同机，NVMe，MySQL=127.0.0.1:3307，Redis=127.0.0.1:6379）：
+
+- 文件：1MB；
+- 场景：单对象高频 GET；
+- 参数：并发 `10`，迭代 `1000`；
+- 工具：`scripts/bench_download.sh`；
+- A/B：仅切换 `redis.enabled`（其余配置保持一致）。
+
+结果：
+
+| 指标 | Redis 关闭 | Redis 开启 | 变化 |
+|------|------------|------------|------|
+| Total time | 0.7319s | 0.6321s | **-13.6%** |
+| Throughput | 1366.36 MB/s | 1581.92 MB/s | **+15.8%** |
+| Ops | 1366.36 ops/s | 1581.92 ops/s | **+15.8%** |
+| Avg latency | 2.0ms | 1.0ms | **-50.0%** |
+| P50 | 2.148ms | 1.074ms | **-50.0%** |
+| P95 | 3.241ms | 1.719ms | **-47.0%** |
+| P99 | 3.757ms | 2.188ms | **-41.8%** |
+
+结论：
+
+- Redis 对“同对象高频 GET”场景有稳定正收益，当前实测约 **15%~16% 吞吐提升**，并显著降低尾延迟；
+- PUT 路径主瓶颈仍在 MySQL 事务与存储同步，不是本轮优化重点；
+- 建议将 Redis 保持为可选能力：生产环境按读热点比例决定是否开启。
+
+注意事项：
+
+- 在极端并发压测（更高并发与更长时长）中，当前工程仍存在与本轮 Redis 无关的稳定性问题（历史错误路径会触发进程异常），该问题需后续专项修复后再做更高强度基准。
+
+---
+
+## 第八轮实验（2026-03-08）：Redis 对 PUT 路径影响评估
+
+目标：验证“引入 Redis 作为对象元数据缓存”是否会影响 PUT 路径性能。
+
+### 测试方法
+
+- 服务配置：
+  - A 组：`redis.enabled=false`（`/tmp/server.put.redis.off.yaml`）
+  - B 组：`redis.enabled=true`（`/tmp/server.put.redis.on.yaml`）
+- 其余配置保持一致（同机、同 NVMe、同 MySQL=127.0.0.1:3307）。
+- 压测命令：`scripts/bench_upload.sh`
+- 负载参数：4KB 对象、并发 20、迭代 200。
+- 为避免对象键冲突干扰，每轮均使用新 bucket 名称。
+- 每组执行 2 轮，统计均值。
+
+### 原始结果
+
+| 组别 | Run1 Ops/s | Run2 Ops/s | 平均 Ops/s |
+|------|------------|------------|------------|
+| Redis 关闭 | 9.33 | 9.05 | **9.19** |
+| Redis 开启 | 7.63 | 7.44 | **7.535** |
+
+变化（开启 vs 关闭）：
+
+- PUT Ops/s：`9.19 -> 7.535`，约 **-18.0%**。
+
+### 分析
+
+1. 当前实现里，PUT 成功提交后会做 Redis 写入（缓存更新/失效），该额外网络往返与序列化开销会落在写路径上。
+2. 本次口径是小对象高并发 PUT（4KB，20 并发），MySQL 事务与同步写本就紧张，叠加 Redis 操作后更容易放大端到端时延。
+3. 结合第七轮 GET 结论：Redis 对读热点有正收益，但对 PUT 会带来可测写放大。
+
+### 结论与建议
+
+- 结论：在当前实现与本次压测口径下，Redis 对 PUT 路径有负向影响（约 -18% Ops/s）。
+- 建议：
+  1) 若业务以读为主，可保留 Redis（GET 收益通常可覆盖 PUT 损耗）；
+  2) 若业务写入占比较高，建议评估“异步回填缓存”或“仅删除不回填”策略，减少 PUT 临界路径中的 Redis 往返；
+  3) 后续应补充更多口径（1MB PUT、多并发档位、跨主机）再决定默认开关策略。
+
+---
+
+## 第九轮实验（2026-03-08）：随机内容“真实场景”规范化基准
+
+目标：尽量模拟真实业务分布（随机内容、随机 key 访问、读写混合），给出可复现、可审计的性能结果。
+
+### 测试规范（正规口径）
+
+1) **数据分布**：全部使用 `/dev/urandom` 生成随机 payload，避免固定内容导致单一 `cas_key` 热点偏差。
+2) **场景覆盖**：
+  - 随机 PUT（4KB、1MB）
+  - 随机 GET（4KB、1MB，随机 key）
+  - 读写混合（70% GET / 30% PUT）
+3) **环境控制**：同机、同配置、同依赖（MySQL 127.0.0.1:3307、Redis 127.0.0.1:6379、NVMe 路径）。
+4) **统计口径**：成功率、总时长、Ops/s、吞吐（MB/s）、Avg/P50/P95/P99。
+5) **可复现性**：新增脚本
+  - `scripts/bench_realistic_random.sh`
+  - `scripts/bench_realistic_random_low_get_mix.sh`
+
+### 实测结果（随机内容）
+
+#### A) 随机 PUT
+
+| 场景 | 并发 × 次数 | 成功率 | Ops/s | 吞吐 | Avg | P50 | P95 | P99 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| PUT 4KB Random | 10 × 200 | 200/200 | 12.34 | 0.04 MB/s | 794.7ms | 738.7ms | 1495.9ms | 1910.5ms |
+| PUT 1MB Random | 4 × 40 | 40/40 | 10.12 | 10.12 MB/s | 381.9ms | 315.5ms | 985.0ms | 1021.8ms |
+
+#### B) 随机 GET（随机 key）
+
+| 场景 | 并发 × 次数 | 成功率 | Ops/s | 吞吐 | Avg | P50 | P95 | P99 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| GET 4KB RandomKey（Low） | 5 × 800 | 800/800 | 1065.17 | 4.16 MB/s | 0.656ms | 0.617ms | 1.081ms | 1.282ms |
+| GET 1MB RandomKey（Low） | 4 × 200 | 200/200 | 803.55 | 803.55 MB/s | 0.949ms | 0.929ms | 1.208ms | 1.619ms |
+
+#### C) 读写混合（70% GET / 30% PUT，4KB）
+
+- 在混合压测过程中，服务进程触发 `segmentation fault` / `double free or corruption`，未能得到有效成功样本（`0/300`）。
+- 该现象与此前高压随机场景的崩溃征象一致，说明当前存在需优先修复的稳定性缺陷。
+
+### 分析
+
+1. **随机内容后，PUT 仍显著低于目标**
+  - 4KB PUT 仅 12.34 ops/s（目标 2000 ops/s），说明瓶颈不只是固定内容热点，而是写路径本身（事务 + 落盘 + 同步依赖）偏重。
+
+2. **随机 GET 表现稳定且远优于 PUT**
+  - 在低压口径下 GET 延迟为亚毫秒级、吞吐较高；读路径仍明显轻于写路径。
+
+3. **混合流量暴露稳定性风险**
+  - 读写交错下出现崩溃，优先级高于继续追求吞吐增益；若不先修复稳定性，后续高强度性能结论可信度有限。
+
+### 结论与后续
+
+- 结论：在“随机内容 + 随机 key”更贴近真实业务的口径下，系统的主矛盾仍是 PUT 路径性能和混合流量稳定性，而非 GET 吞吐。
+- 建议下一步按优先级推进：
+  1) **P0：先修复混合负载崩溃（double free/segfault）**，恢复压测可信性；
+  2) **P1：继续瘦身 PUT 临界路径**（减少事务往返、弱化同步缓存写）；
+  3) **P1：在崩溃修复后重跑同口径随机混合基准**，再评估优化收益。

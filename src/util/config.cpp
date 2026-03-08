@@ -60,6 +60,22 @@ MySQLConfig ParseMySQLConfig(const YAML::Node& node) {
     return config;
 }
 
+RedisConfig ParseRedisConfig(const YAML::Node& node) {
+    RedisConfig config;
+    if (!node) return config;
+
+    config.enabled = GetOrDefault<bool>(node, "enabled", config.enabled);
+    config.host = GetOrDefault<std::string>(node, "host", config.host);
+    config.port = GetOrDefault<uint16_t>(node, "port", config.port);
+    config.password = GetOrDefault<std::string>(node, "password", config.password);
+    config.db = GetOrDefault<int>(node, "db", config.db);
+    config.connect_timeout_ms = GetOrDefault<int>(node, "connect_timeout_ms", config.connect_timeout_ms);
+    config.command_timeout_ms = GetOrDefault<int>(node, "command_timeout_ms", config.command_timeout_ms);
+    config.object_meta_ttl_seconds = GetOrDefault<int>(node, "object_meta_ttl_seconds", config.object_meta_ttl_seconds);
+
+    return config;
+}
+
 AuthConfig ParseAuthConfig(const YAML::Node& node) {
     // 解析 auth 配置
     AuthConfig config;
@@ -162,6 +178,7 @@ Config Config::LoadFromString(const std::string& yaml_content) {
     config.server = ParseServerConfig(root["server"]);
     config.storage = ParseStorageConfig(root["storage"]);
     config.mysql = ParseMySQLConfig(root["mysql"]);
+    config.redis = ParseRedisConfig(root["redis"]);
     config.auth = ParseAuthConfig(root["auth"]);
     config.limits = ParseLimitsConfig(root["limits"]);
     config.multipart = ParseMultipartConfig(root["multipart"]);

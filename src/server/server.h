@@ -9,6 +9,7 @@
 #include "db/meta_store.h"
 #include "storage/data_store.h"
 #include "storage/gc.h"
+#include "util/redis_cache.h"
 #include <memory>
 #include <vector>
 #include <thread>
@@ -117,6 +118,7 @@ private:
     // 存储层
     std::unique_ptr<MySQLPool> mysql_pool_;
     std::unique_ptr<MetaStore> meta_store_;
+    std::shared_ptr<RedisCache> redis_cache_;
     std::unique_ptr<DataStore> data_store_;
     std::unique_ptr<GarbageCollector> gc_;
     

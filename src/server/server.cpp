@@ -41,6 +41,20 @@ Status Server::Init() {
     
     // 3. 初始化 MetaStore（SQL 访问与事务封装）
     meta_store_ = std::make_unique<MetaStore>(*mysql_pool_);
+
+    // 3.1 可选初始化 Redis 缓存（对象元数据）
+    if (config_.redis.enabled) {
+        redis_cache_ = std::make_shared<RedisCache>(config_.redis);
+        auto redis_status = redis_cache_->Init();
+        if (!redis_status.ok()) {
+            spdlog::warn("Redis cache init failed, continue without redis: {}", redis_status.message());
+            redis_cache_.reset();
+        } else {
+            meta_store_->SetRedisCache(redis_cache_);
+            spdlog::info("Redis cache enabled at {}:{} (db={})",
+                         config_.redis.host, config_.redis.port, config_.redis.db);
+        }
+    }
     
     // 4. 初始化 DataStore（CAS 文件存储）
     spdlog::info("Initializing storage at {}...", config_.storage.data_dir);
